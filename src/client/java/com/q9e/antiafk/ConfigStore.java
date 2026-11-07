@@ -25,4 +25,23 @@ public final class ConfigStore {
         return FabricLoader.getInstance().getConfigDir().resolve("anti-afk-auto-reconnect.json");
     }
 
+    public static ModConfig load() {
+        Path path = configPath();
+        if (!Files.exists(path)) {
+            return new ModConfig();
+        }
+
+        try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+            ModConfig config = GSON.fromJson(reader, ModConfig.class);
+            if (config == null || config.validationError() != null) {
+                LOGGER.warn("Configuration is invalid; using defaults: {}", config == null ? "empty file" : config.validationError());
+                return new ModConfig();
+            }
+            return config;
+        } catch (IOException | JsonParseException exception) {
+            LOGGER.warn("Could not read configuration at {}; using defaults.", path, exception);
+            return new ModConfig();
+        }
+    }
+
 }
