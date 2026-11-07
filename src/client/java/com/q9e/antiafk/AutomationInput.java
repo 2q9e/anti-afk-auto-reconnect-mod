@@ -8,4 +8,12 @@ import net.minecraft.client.KeyMapping;
 
 public final class AutomationInput {
     private final Set<KeyMapping> heldMappings = Collections.newSetFromMap(new IdentityHashMap<>());
+    public boolean tap(KeyMapping mapping) {
+        if (mapping.isDown()) {
+            return false;
+        }
+        KeyMapping.click(mapping.getKey());
+        return true;
+    }
+
 }
