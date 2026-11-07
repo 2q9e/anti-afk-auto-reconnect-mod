@@ -21,4 +21,8 @@ public final class ConfigStore {
 
     private ConfigStore() {
     }
+    public static Path configPath() {
+        return FabricLoader.getInstance().getConfigDir().resolve("anti-afk-auto-reconnect.json");
+    }
+
 }
