@@ -1,0 +1,25 @@
+package com.q9e.antiafk;
+
+import java.util.List;
+
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+
+public final class AntiAfkScheduler {
+    public static final int HIT_HOLD_SECONDS = 1;
+
+    private final AutomationInput input = new AutomationInput();
+    private long tick;
+    private long startAt;
+    private long nextJumpAt;
+    private long nextHitAt;
+    private long hitReleaseAt;
+    private long nextCrouchAt;
+    private long crouchReleaseAt;
+    private long nextMoveAt;
+    private long moveReleaseAt;
+    private MovementDirection activeMoveDirection;
+    private int movementIndex;
+    private Object activeLevel;
+    private boolean running;
+}
