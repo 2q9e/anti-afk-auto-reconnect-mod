@@ -44,4 +44,22 @@ public final class ConfigStore {
         }
     }
 
+    public static void save(ModConfig config) throws IOException {
+        String error = config.validationError();
+        if (error != null) {
+            throw new IllegalArgumentException(error);
+        }
+
+        Path path = configPath();
+        Files.createDirectories(path.getParent());
+        Path temporaryPath = path.resolveSibling(path.getFileName() + ".tmp");
+        Files.writeString(temporaryPath, GSON.toJson(config), StandardCharsets.UTF_8);
+
+        try {
+            Files.move(temporaryPath, path, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (AtomicMoveNotSupportedException exception) {
+            Files.move(temporaryPath, path, StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
+
 }
