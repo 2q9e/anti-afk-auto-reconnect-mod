@@ -31,4 +31,15 @@ public final class AutomationInput {
         }
     }
 
+    public void releaseAll() {
+        for (KeyMapping mapping : heldMappings) {
+            mapping.setDown(false);
+        }
+        heldMappings.clear();
+    }
+
+    public boolean owns(KeyMapping mapping) {
+        return heldMappings.contains(mapping);
+    }
+
 }
