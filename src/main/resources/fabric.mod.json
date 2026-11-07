@@ -6,5 +6,7 @@
   "description": "Timed anti-AFK actions and configurable reconnect settings for Minecraft Java.",
   "authors": [
     "2q9e"
-  ]
+  ],
+  "license": "MIT",
+  "environment": "client"
 }
