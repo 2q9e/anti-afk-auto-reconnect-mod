@@ -16,4 +16,13 @@ public final class AutomationInput {
         return true;
     }
 
+    public boolean hold(KeyMapping mapping) {
+        if (mapping.isDown()) {
+            return false;
+        }
+        mapping.setDown(true);
+        heldMappings.add(mapping);
+        return true;
+    }
+
 }
