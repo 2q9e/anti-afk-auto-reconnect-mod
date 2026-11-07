@@ -8,3 +8,14 @@ version = project.mod_version
 base {
     archivesName = project.archives_base_name
 }
+
+loom {
+    splitEnvironmentSourceSets()
+
+    mods {
+        "anti_afk_reconnect" {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.client
+        }
+    }
+}
