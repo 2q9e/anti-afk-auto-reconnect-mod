@@ -1,4 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "anti_afk_reconnect"
+  "id": "anti_afk_reconnect",
+  "version": "${version}",
+  "name": "Anti-AFK and Auto Reconnect"
 }
