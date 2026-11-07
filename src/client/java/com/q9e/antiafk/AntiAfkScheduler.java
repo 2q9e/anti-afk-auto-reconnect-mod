@@ -79,4 +79,19 @@ public final class AntiAfkScheduler {
         nextJumpAt = tick + secondsToTicks(settings.jump.intervalSeconds);
     }
 
+    private void scheduleHit(Minecraft client, AntiAfkSettings settings) {
+        KeyMapping attack = client.options.keyAttack;
+        if (!settings.hit.enabled || tick < nextHitAt) {
+            return;
+        }
+
+        if (input.hold(attack)) {
+            // Queue the vanilla attack binding; Minecraft resolves the current target,
+            // including block occlusion, through its ordinary interaction flow.
+            KeyMapping.click(attack.getKey());
+            hitReleaseAt = tick + secondsToTicks(HIT_HOLD_SECONDS);
+        }
+        nextHitAt = tick + secondsToTicks(settings.hit.intervalSeconds);
+    }
+
 }
