@@ -8,5 +8,10 @@
     "2q9e"
   ],
   "license": "MIT",
-  "environment": "client"
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.q9e.antiafk.AntiAfkClient"
+    ]
+  }
 }
