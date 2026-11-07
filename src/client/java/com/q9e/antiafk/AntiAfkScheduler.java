@@ -22,4 +22,12 @@ public final class AntiAfkScheduler {
     private int movementIndex;
     private Object activeLevel;
     private boolean running;
+    public void reset(Minecraft client) {
+        input.releaseAll();
+        activeLevel = null;
+        activeMoveDirection = null;
+        movementIndex = 0;
+        running = false;
+    }
+
 }
