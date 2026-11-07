@@ -2,5 +2,9 @@
   "schemaVersion": 1,
   "id": "anti_afk_reconnect",
   "version": "${version}",
-  "name": "Anti-AFK and Auto Reconnect"
+  "name": "Anti-AFK and Auto Reconnect",
+  "description": "Timed anti-AFK actions and configurable reconnect settings for Minecraft Java.",
+  "authors": [
+    "2q9e"
+  ]
 }
