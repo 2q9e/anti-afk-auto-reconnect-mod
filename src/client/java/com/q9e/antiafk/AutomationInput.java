@@ -25,4 +25,10 @@ public final class AutomationInput {
         return true;
     }
 
+    public void release(KeyMapping mapping) {
+        if (heldMappings.remove(mapping)) {
+            mapping.setDown(false);
+        }
+    }
+
 }
