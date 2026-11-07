@@ -30,4 +30,30 @@ public final class AntiAfkScheduler {
         running = false;
     }
 
+    public void tick(Minecraft client, AntiAfkSettings settings) {
+        tick++;
+        if (settings == null || !settings.enabled || client.player == null
+            || client.level == null || client.gui.screen() != null) {
+            reset(client);
+            return;
+        }
+
+        if (activeLevel != client.level) {
+            reset(client);
+            activeLevel = client.level;
+        }
+        if (!running) {
+            begin(settings);
+        }
+        if (tick < startAt) {
+            return;
+        }
+
+        releaseExpiredInputs(client);
+        scheduleJump(client, settings);
+        scheduleHit(client, settings);
+        scheduleCrouch(client, settings);
+        scheduleMove(client, settings);
+    }
+
 }
