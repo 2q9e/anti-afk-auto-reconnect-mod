@@ -70,4 +70,13 @@ public final class AntiAfkScheduler {
         running = true;
     }
 
+    private void scheduleJump(Minecraft client, AntiAfkSettings settings) {
+        if (!settings.jump.enabled || tick < nextJumpAt) {
+            return;
+        }
+
+        input.tap(client.options.keyJump);
+        nextJumpAt = tick + secondsToTicks(settings.jump.intervalSeconds);
+    }
+
 }
