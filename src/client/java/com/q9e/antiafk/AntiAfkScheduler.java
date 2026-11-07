@@ -56,4 +56,18 @@ public final class AntiAfkScheduler {
         scheduleMove(client, settings);
     }
 
+    private void begin(AntiAfkSettings settings) {
+        startAt = tick + secondsToTicks(settings.startDelaySeconds);
+        nextJumpAt = startAt;
+        nextHitAt = startAt;
+        nextCrouchAt = startAt;
+        nextMoveAt = startAt;
+        hitReleaseAt = 0;
+        crouchReleaseAt = 0;
+        moveReleaseAt = 0;
+        activeMoveDirection = null;
+        movementIndex = 0;
+        running = true;
+    }
+
 }
