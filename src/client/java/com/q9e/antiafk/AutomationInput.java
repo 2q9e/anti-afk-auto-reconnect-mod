@@ -4,20 +4,29 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Set;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 
 public final class AutomationInput {
     private final Set<KeyMapping> heldMappings = Collections.newSetFromMap(new IdentityHashMap<>());
+
     public boolean tap(KeyMapping mapping) {
         if (mapping.isDown()) {
             return false;
         }
-        KeyMapping.click(mapping.getKey());
+        return queueClick(mapping);
+    }
+
+    public boolean queueClick(KeyMapping mapping) {
+        if (mapping.isUnbound()) {
+            return false;
+        }
+        KeyMapping.click(InputConstants.getKey(mapping.saveString()));
         return true;
     }
 
     public boolean hold(KeyMapping mapping) {
-        if (mapping.isDown()) {
+        if (mapping.isDown() || mapping.isUnbound()) {
             return false;
         }
         mapping.setDown(true);
@@ -41,5 +50,4 @@ public final class AutomationInput {
     public boolean owns(KeyMapping mapping) {
         return heldMappings.contains(mapping);
     }
-
 }
