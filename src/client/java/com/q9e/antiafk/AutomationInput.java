@@ -60,7 +60,7 @@ public final class AutomationInput {
             return InputConstants.isKeyDown(key.getValue());
         }
         if (key.getType() == InputConstants.Type.MOUSE) {
-            int buttonMask = 1 << (key.getValue() + 1);
+            int buttonMask = 1 << (key.getValue() - 1);
             return (SDLMouse.SDL_GetMouseState(null, null) & buttonMask) != 0;
         }
         return false;
