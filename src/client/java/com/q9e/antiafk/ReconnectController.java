@@ -28,6 +28,11 @@ public final class ReconnectController {
     }
 
     private final Queue<String> postReconnectMessages = new ArrayDeque<>();
+    private final ClientChatSendGate chatSendGate;
+
+    public ReconnectController(ClientChatSendGate chatSendGate) {
+        this.chatSendGate = chatSendGate;
+    }
     private State state = State.IDLE;
     private ClientPacketListener playConnection;
     private Screen previousDisconnectScreen;
@@ -199,16 +204,23 @@ public final class ReconnectController {
             return;
         }
 
-        String line = postReconnectMessages.remove();
+        String line = postReconnectMessages.peek();
+        boolean sent;
         if (line.startsWith("/")) {
             String command = line.substring(1).strip();
-            if (!command.isBlank()) {
-                playConnection.sendCommand(command);
+            if (command.isBlank()) {
+                postReconnectMessages.remove();
+                return;
             }
-        } else if (!line.isBlank()) {
-            playConnection.sendChat(line);
+            sent = chatSendGate.trySendCommand(playConnection, command);
+        } else {
+            sent = !line.isBlank() && chatSendGate.trySendChat(playConnection, line);
         }
-        nextMessageAt = tick + TICKS_PER_SECOND;
+
+        if (sent) {
+            postReconnectMessages.remove();
+            nextMessageAt = tick + TICKS_PER_SECOND;
+        }
     }
 
     private void clear() {
