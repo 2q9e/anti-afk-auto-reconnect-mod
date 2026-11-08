@@ -8,13 +8,19 @@ import java.util.function.Consumer;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.ScrollableLayout;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
+import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 public final class ReconnectSettingsScreen extends Screen {
     private final Screen parent;
     private final ModConfig draft;
-
+    private HeaderAndFooterLayout layout;
+    private ScrollableLayout scrollArea;
+    private LinearLayout form;
     private EditBox serverAddress;
     private EditBox firstRetryDelay;
     private EditBox subsequentRetryDelay;
@@ -31,57 +37,71 @@ public final class ReconnectSettingsScreen extends Screen {
     @Override
     protected void init() {
         ReconnectSettings settings = draft.reconnect;
-        int left = Math.max(18, width / 2 - 215);
+        int widgetWidth = Math.max(120, Math.min(360, width - 64));
+        int buttonWidth = Math.max(110, Math.min(240, width - 64));
         reconnectEnabled = settings.enabled;
 
-        addRenderableWidget(toggle(left, 42, 190, "Auto reconnect", () -> reconnectEnabled, value -> reconnectEnabled = value));
+        layout = new HeaderAndFooterLayout(this, 32, 42);
+        layout.addTitleHeader(title, font);
+        form = LinearLayout.vertical().spacing(5);
+        form.defaultCellSetting().alignHorizontallyLeft();
 
-        serverAddress = new EditBox(font, left, 87, 410, 20, Component.literal("Server address"));
-        serverAddress.setMaxLength(255);
-        serverAddress.setValue(settings.serverAddress);
-        addRenderableWidget(serverAddress);
-
-        firstRetryDelay = numericField(left, 137, settings.firstRetryDelaySeconds);
-        subsequentRetryDelay = numericField(left, 187, settings.subsequentRetryDelaySeconds);
-
+        addToggle("Auto reconnect", buttonWidth, () -> reconnectEnabled, value -> reconnectEnabled = value);
+        addLabel("Server address (host or host:port)");
+        serverAddress = textField(settings.serverAddress, widgetWidth, "Server address", 255);
+        addLabel("First retry delay (seconds)");
+        firstRetryDelay = numberField(settings.firstRetryDelaySeconds);
+        addLabel("Later retry delay (seconds)");
+        subsequentRetryDelay = numberField(settings.subsequentRetryDelaySeconds);
+        addLabel("Up to five messages or commands after an automatic reconnect");
         List<String> messages = draft.afterReconnectMessages == null
             ? List.of("", "", "", "", "")
             : draft.afterReconnectMessages;
         for (int i = 0; i < afterReconnectMessages.length; i++) {
             String value = i < messages.size() && messages.get(i) != null ? messages.get(i) : "";
-            EditBox field = new EditBox(font, left, 235 + i * 29, 410, 20, Component.literal("After reconnect message " + (i + 1)));
-            field.setMaxLength(256);
-            field.setValue(value);
-            afterReconnectMessages[i] = field;
-            addRenderableWidget(field);
+            addLabel("Message " + (i + 1));
+            afterReconnectMessages[i] = textField(value, widgetWidth, "After reconnect message " + (i + 1), 256);
         }
 
-        addRenderableWidget(Button.builder(Component.literal("Apply"), button -> apply())
-            .bounds(width / 2 - 105, height - 38, 100, 24).build());
-        addRenderableWidget(Button.builder(Component.literal("Cancel"), button -> minecraft.gui.setScreen(parent))
-            .bounds(width / 2 + 5, height - 38, 100, 24).build());
+        scrollArea = new ScrollableLayout(minecraft, form, layout.getContentHeight());
+        scrollArea.setMinWidth(Math.min(width - 32, 360));
+        layout.addToContents(scrollArea);
+
+        LinearLayout footer = LinearLayout.horizontal().spacing(8);
+        footer.addChild(Button.builder(Component.literal("Apply"), button -> apply())
+            .bounds(0, 0, 92, 24).build());
+        footer.addChild(Button.builder(Component.literal("Cancel"), button -> minecraft.gui.setScreen(parent))
+            .bounds(0, 0, 92, 24).build());
+        layout.addToFooter(footer);
+
+        repositionElements();
+        layout.visitWidgets(this::addRenderableWidget);
     }
 
-    private Button toggle(
-        int x,
-        int y,
-        int buttonWidth,
-        String label,
-        BooleanSupplier read,
-        Consumer<Boolean> write
-    ) {
-        return Button.builder(toggleMessage(label, read.getAsBoolean()), button -> {
+    private void addLabel(String text) {
+        StringWidget label = new StringWidget(Component.literal(text), font)
+            .setMaxWidth(Math.max(120, width - 48));
+        form.addChild(label);
+    }
+
+    private void addToggle(String label, int buttonWidth, BooleanSupplier read, Consumer<Boolean> write) {
+        Button button = Button.builder(toggleMessage(label, read.getAsBoolean()), widget -> {
             boolean nextValue = !read.getAsBoolean();
             write.accept(nextValue);
-            button.setMessage(toggleMessage(label, nextValue));
-        }).bounds(x, y, buttonWidth, 22).build();
+            widget.setMessage(toggleMessage(label, nextValue));
+        }).bounds(0, 0, buttonWidth, 22).build();
+        form.addChild(button);
     }
 
-    private EditBox numericField(int x, int y, int value) {
-        EditBox field = new EditBox(font, x, y, 110, 20, Component.empty());
-        field.setMaxLength(8);
-        field.setValue(Integer.toString(value));
-        addRenderableWidget(field);
+    private EditBox numberField(int value) {
+        return textField(Integer.toString(value), 110, "Retry delay", 8);
+    }
+
+    private EditBox textField(String value, int fieldWidth, String narration, int maxLength) {
+        EditBox field = new EditBox(font, 0, 0, fieldWidth, 20, Component.literal(narration));
+        field.setMaxLength(maxLength);
+        field.setValue(value);
+        form.addChild(field);
         return field;
     }
 
@@ -128,6 +148,20 @@ public final class ReconnectSettingsScreen extends Screen {
     }
 
     @Override
+    protected void repositionElements() {
+        if (layout == null || scrollArea == null) {
+            return;
+        }
+        form.arrangeElements();
+        scrollArea.arrangeElements();
+        scrollArea.setMaxHeight(layout.getContentHeight());
+        scrollArea.setMinHeight(layout.getContentHeight());
+        layout.arrangeElements();
+        scrollArea.setX((width - scrollArea.getWidth()) / 2);
+        scrollArea.setY(layout.getHeaderHeight());
+    }
+
+    @Override
     public void extractRenderState(
         GuiGraphicsExtractor graphics,
         int mouseX,
@@ -135,13 +169,8 @@ public final class ReconnectSettingsScreen extends Screen {
         float delta
     ) {
         super.extractRenderState(graphics, mouseX, mouseY, delta);
-        int left = Math.max(18, width / 2 - 215);
-        graphics.text(font, "Server address (host or host:port)", left, 73, 0xFFFFFFFF, true);
-        graphics.text(font, "First retry delay (seconds)", left, 123, 0xFFFFFFFF, true);
-        graphics.text(font, "Later retry delay (seconds)", left, 173, 0xFFFFFFFF, true);
-        graphics.text(font, "Messages or commands after a successful automatic reconnect", left, 218, 0xFFFFFFFF, true);
         if (!status.isEmpty()) {
-            graphics.text(font, status, 18, height - 62, 0xFFFF5555, true);
+            graphics.text(font, status, 12, height - 56, 0xFFFF5555, true);
         }
     }
 
