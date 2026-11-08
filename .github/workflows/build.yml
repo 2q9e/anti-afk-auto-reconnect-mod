@@ -26,6 +26,6 @@ jobs:
           ./gradlew build --no-daemon
       - name: Verify supported 26.1 patch baselines
         run: |
-          ./gradlew :26.1:build --no-daemon -Pminecraft_version=26.1 -Pfabric_api_version=0.145.1+26.1
-          ./gradlew :26.1:build --no-daemon -Pminecraft_version=26.1.1 -Pfabric_api_version=0.145.4+26.1.1
-          ./gradlew :26.1:build --no-daemon -Pminecraft_version=26.1.2 -Pfabric_api_version=0.155.3+26.1.2
+          ./gradlew :versions:26.1:build --no-daemon -Pminecraft_version=26.1 -Pfabric_api_version=0.145.1+26.1
+          ./gradlew :versions:26.1:build --no-daemon -Pminecraft_version=26.1.1 -Pfabric_api_version=0.145.4+26.1.1
+          ./gradlew :versions:26.1:build --no-daemon -Pminecraft_version=26.1.2 -Pfabric_api_version=0.155.3+26.1.2
