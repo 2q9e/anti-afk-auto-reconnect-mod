@@ -199,7 +199,7 @@ public final class ReconnectController {
 
         String line = postReconnectMessages.remove();
         if (line.startsWith("/")) {
-            String command = line.substring(1);
+            String command = line.substring(1).strip();
             if (!command.isBlank()) {
                 playConnection.sendCommand(command);
             }
