@@ -172,7 +172,9 @@ public final class ModConfig {
     }
 
     private static boolean isValidIpv6Literal(String host) {
-        if (!host.contains(":") || !host.matches("[0-9A-Fa-f:]+")) {
+        if (!host.contains(":") || !host.matches("[0-9A-Fa-f:]+")
+            || (host.startsWith(":") && !host.startsWith("::"))
+            || (host.endsWith(":") && !host.endsWith("::"))) {
             return false;
         }
 
