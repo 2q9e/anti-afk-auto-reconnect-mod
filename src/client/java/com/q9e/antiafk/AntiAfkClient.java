@@ -1,6 +1,7 @@
 package com.q9e.antiafk;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ClientModInitializer;
@@ -62,6 +63,9 @@ public final class AntiAfkClient implements ClientModInitializer {
             return validationError;
         }
 
+        boolean antiAfkChanged = !sameAntiAfk(config.antiAfk, updated.antiAfk);
+        boolean reconnectChanged = !sameReconnect(config.reconnect, updated.reconnect);
+
         try {
             ConfigStore.save(updated);
         } catch (IOException | IllegalArgumentException exception) {
@@ -69,8 +73,40 @@ public final class AntiAfkClient implements ClientModInitializer {
         }
 
         config = updated.copy();
-        scheduler.reset(client);
-        reconnectController.onSettingsChanged(config.reconnect);
+        if (antiAfkChanged) {
+            scheduler.reset(client);
+        }
+        if (reconnectChanged) {
+            reconnectController.onSettingsChanged(config.reconnect);
+        }
         return null;
+    }
+
+    private static boolean sameAntiAfk(AntiAfkSettings left, AntiAfkSettings right) {
+        return left.enabled == right.enabled
+            && left.startDelaySeconds == right.startDelaySeconds
+            && sameTap(left.jump, right.jump)
+            && sameTap(left.hit, right.hit)
+            && sameTimed(left.crouch, right.crouch)
+            && sameTimed(left.move, right.move)
+            && Objects.equals(left.movementOrder, right.movementOrder);
+    }
+
+    private static boolean sameTap(TapActionSettings left, TapActionSettings right) {
+        return left.enabled == right.enabled
+            && left.intervalSeconds == right.intervalSeconds;
+    }
+
+    private static boolean sameTimed(TimedActionSettings left, TimedActionSettings right) {
+        return left.enabled == right.enabled
+            && left.intervalSeconds == right.intervalSeconds
+            && left.durationSeconds == right.durationSeconds;
+    }
+
+    private static boolean sameReconnect(ReconnectSettings left, ReconnectSettings right) {
+        return left.enabled == right.enabled
+            && Objects.equals(left.serverAddress, right.serverAddress)
+            && left.firstRetryDelaySeconds == right.firstRetryDelaySeconds
+            && left.subsequentRetryDelaySeconds == right.subsequentRetryDelaySeconds;
     }
 }
