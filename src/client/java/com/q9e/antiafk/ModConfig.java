@@ -68,6 +68,10 @@ public final class ModConfig {
             || line.length() > 256 || line.chars().anyMatch(Character::isISOControl))) {
             return "Each post-reconnect line must be single-line text of 256 characters or fewer.";
         }
+        if (afterReconnectMessages.stream().anyMatch(line -> line.startsWith("/")
+            && line.substring(1).isBlank())) {
+            return "A slash command must include text after the slash.";
+        }
         return null;
     }
 
