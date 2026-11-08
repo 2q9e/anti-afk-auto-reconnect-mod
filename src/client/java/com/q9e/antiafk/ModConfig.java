@@ -1,6 +1,8 @@
 package com.q9e.antiafk;
 
 import java.util.ArrayList;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.List;
 
@@ -172,31 +174,19 @@ public final class ModConfig {
     }
 
     private static boolean isValidIpv6Literal(String host) {
-        if (!host.contains(":") || !host.matches("[0-9A-Fa-f:]+")
-            || (host.startsWith(":") && !host.startsWith("::"))
-            || (host.endsWith(":") && !host.endsWith("::"))) {
+        if (!host.contains(":") || !host.matches("[0-9A-Fa-f:.]+")) {
             return false;
         }
 
-        int compression = host.indexOf("::");
-        if (compression >= 0 && compression != host.lastIndexOf("::")) {
+        try {
+            // The colon and character checks keep this on Java's numeric IPv6 parser,
+            // while supporting both compressed groups and embedded IPv4 tails.
+            InetAddress.getByName(host);
+            return true;
+        } catch (UnknownHostException exception) {
             return false;
         }
-
-        String[] groups = host.split(":", -1);
-        int groupCount = 0;
-        for (String group : groups) {
-            if (group.isEmpty()) {
-                continue;
-            }
-            if (group.length() > 4 || !group.matches("[0-9A-Fa-f]+")) {
-                return false;
-            }
-            groupCount++;
-        }
-        return compression >= 0 ? groupCount < 8 : groupCount == 8;
     }
-
     private static boolean isValidPort(String port) {
         if (port.isEmpty() || !port.matches("[0-9]+")) {
             return false;
