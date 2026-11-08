@@ -32,6 +32,7 @@ public final class ReconnectController {
     private ClientPacketListener playConnection;
     private Screen previousDisconnectScreen;
     private Screen connectScreen;
+    private ServerData attemptedServer;
     private long tick;
     private long retryAt;
     private long nextMessageAt;
@@ -57,10 +58,16 @@ public final class ReconnectController {
     }
 
     public void onPlayJoin(Minecraft client, ClientPacketListener listener, ModConfig config) {
-        boolean reconnectedAutomatically = automaticAttempt;
+        ServerData currentServer = client.getCurrentServer();
+        boolean reconnectedAutomatically = automaticAttempt
+            && attemptedServer != null
+            && currentServer != null
+            && (currentServer == attemptedServer
+                || currentServer.ip.equalsIgnoreCase(attemptedServer.ip));
         playConnection = listener;
         previousDisconnectScreen = null;
         connectScreen = null;
+        attemptedServer = null;
         state = State.PLAYING;
         retriesScheduled = 0;
         automaticAttempt = false;
@@ -153,6 +160,7 @@ public final class ReconnectController {
                 addressText,
                 ServerData.Type.OTHER
             );
+            attemptedServer = server;
             previousDisconnectScreen = client.gui.screen();
             ConnectScreen.startConnecting(
                 previousDisconnectScreen,
@@ -178,6 +186,7 @@ public final class ReconnectController {
         state = State.WAITING;
         automaticAttempt = false;
         connectScreen = null;
+        attemptedServer = null;
     }
 
     private void sendNextMessage(Minecraft client) {
@@ -205,6 +214,7 @@ public final class ReconnectController {
         playConnection = null;
         previousDisconnectScreen = null;
         connectScreen = null;
+        attemptedServer = null;
         postReconnectMessages.clear();
         retryAt = 0;
         nextMessageAt = 0;
