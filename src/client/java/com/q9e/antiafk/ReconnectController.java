@@ -9,7 +9,7 @@ import net.minecraft.client.gui.screens.DisconnectedScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
-import net.minecraft.client.multiplayer.ServerAddress;
+import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.client.multiplayer.ServerData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
