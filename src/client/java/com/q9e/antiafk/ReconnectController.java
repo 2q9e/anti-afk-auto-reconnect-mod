@@ -1,16 +1,16 @@
 package com.q9e.antiafk;
 
 import java.util.ArrayDeque;
-import java.util.List;
 import java.util.Queue;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.DisconnectedScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.ServerAddress;
 import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.network.chat.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +30,8 @@ public final class ReconnectController {
     private final Queue<String> postReconnectMessages = new ArrayDeque<>();
     private State state = State.IDLE;
     private ClientPacketListener playConnection;
+    private Screen previousDisconnectScreen;
+    private Screen connectScreen;
     private long tick;
     private long retryAt;
     private long nextMessageAt;
@@ -57,12 +59,15 @@ public final class ReconnectController {
     public void onPlayJoin(Minecraft client, ClientPacketListener listener, ModConfig config) {
         boolean reconnectedAutomatically = automaticAttempt;
         playConnection = listener;
+        previousDisconnectScreen = null;
+        connectScreen = null;
         state = State.PLAYING;
         retriesScheduled = 0;
         automaticAttempt = false;
-
         postReconnectMessages.clear();
-        if (reconnectedAutomatically && config != null && config.afterReconnectMessages != null) {
+
+        if (reconnectedAutomatically && config != null && config.reconnect.enabled
+            && config.afterReconnectMessages != null) {
             config.afterReconnectMessages.stream()
                 .filter(line -> line != null && !line.isBlank())
                 .limit(5)
@@ -73,14 +78,19 @@ public final class ReconnectController {
 
     public void onSettingsChanged(ReconnectSettings settings) {
         if (settings == null || !settings.enabled) {
-            clear();
+            postReconnectMessages.clear();
+            if (state != State.PLAYING) {
+                clear();
+            }
         }
     }
 
     public void tick(Minecraft client, ReconnectSettings settings) {
         tick++;
         if (settings == null || !settings.enabled) {
-            if (state != State.PLAYING) {
+            if (state == State.PLAYING) {
+                postReconnectMessages.clear();
+            } else {
                 clear();
             }
             return;
@@ -90,18 +100,30 @@ public final class ReconnectController {
             checkDisconnectScreen(client, settings);
         } else if (state == State.WAITING && tick >= retryAt) {
             beginReconnect(client, settings);
-        } else if (state == State.CONNECTING
-            && client.gui.screen() instanceof DisconnectedScreen) {
-            scheduleRetry(settings);
+        } else if (state == State.CONNECTING) {
+            inspectConnectionScreen(client, settings);
         }
 
         sendNextMessage(client);
     }
 
     private void checkDisconnectScreen(Minecraft client, ReconnectSettings settings) {
-        if (client.gui.screen() instanceof DisconnectedScreen) {
+        Screen screen = client.gui.screen();
+        if (screen instanceof DisconnectedScreen) {
+            previousDisconnectScreen = screen;
             scheduleRetry(settings);
         } else if (tick >= disconnectCheckDeadline) {
+            clear();
+        }
+    }
+
+    private void inspectConnectionScreen(Minecraft client, ReconnectSettings settings) {
+        Screen screen = client.gui.screen();
+        if (screen instanceof DisconnectedScreen && screen != previousDisconnectScreen) {
+            scheduleRetry(settings);
+        } else if (screen == previousDisconnectScreen || screen instanceof TitleScreen) {
+            clear();
+        } else if (screen != connectScreen && screen != null && client.player == null) {
             clear();
         }
     }
@@ -118,14 +140,16 @@ public final class ReconnectController {
                 addressText,
                 ServerData.Type.OTHER
             );
+            previousDisconnectScreen = client.gui.screen();
             ConnectScreen.startConnecting(
-                client.gui.screen(),
+                previousDisconnectScreen,
                 client,
                 address,
                 server,
                 false,
                 null
             );
+            connectScreen = client.gui.screen();
         } catch (RuntimeException exception) {
             LOGGER.warn("Could not start reconnect to the configured server address.", exception);
             scheduleRetry(settings);
@@ -140,6 +164,7 @@ public final class ReconnectController {
         retryAt = tick + secondsToTicks(delaySeconds);
         state = State.WAITING;
         automaticAttempt = false;
+        connectScreen = null;
     }
 
     private void sendNextMessage(Minecraft client) {
@@ -165,6 +190,8 @@ public final class ReconnectController {
     private void clear() {
         state = State.IDLE;
         playConnection = null;
+        previousDisconnectScreen = null;
+        connectScreen = null;
         postReconnectMessages.clear();
         retryAt = 0;
         nextMessageAt = 0;
