@@ -132,12 +132,17 @@ public final class AntiAfkScheduler {
         }
 
         if (input.hold(attack)) {
-            // Vanilla resolves the current crosshair target and block occlusion
-            // through its regular attack handling after this key mapping is queued.
-            input.queueClick(attack);
+            // Invoke Minecraft's regular attack routine so its current hit result,
+            // item checks, block occlusion, and packet path remain authoritative.
+            client.startAttack();
             hitReleaseAt = tick + secondsToTicks(HIT_HOLD_SECONDS);
         }
-        nextHitAt = tick + secondsToTicks(settings.hit.intervalSeconds);
+        // Keep one released client tick between holds so a one-second interval
+        // cannot silently turn the one-second action into a continuous hold.
+        nextHitAt = tick + Math.max(
+            secondsToTicks(settings.hit.intervalSeconds),
+            secondsToTicks(HIT_HOLD_SECONDS) + 1L
+        );
     }
 
     private void scheduleCrouch(Minecraft client, AntiAfkSettings settings) {
