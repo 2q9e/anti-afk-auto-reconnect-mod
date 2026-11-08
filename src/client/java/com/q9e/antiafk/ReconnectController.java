@@ -82,6 +82,14 @@ public final class ReconnectController {
             if (state != State.PLAYING) {
                 clear();
             }
+            return;
+        }
+
+        if (state == State.WAITING) {
+            int delaySeconds = retriesScheduled == 1
+                ? settings.firstRetryDelaySeconds
+                : settings.subsequentRetryDelaySeconds;
+            retryAt = tick + secondsToTicks(delaySeconds);
         }
     }
 
@@ -98,8 +106,12 @@ public final class ReconnectController {
 
         if (state == State.CHECKING_DISCONNECT) {
             checkDisconnectScreen(client, settings);
-        } else if (state == State.WAITING && tick >= retryAt) {
-            beginReconnect(client, settings);
+        } else if (state == State.WAITING) {
+            if (client.player == null && client.gui.screen() != previousDisconnectScreen) {
+                clear();
+            } else if (tick >= retryAt) {
+                beginReconnect(client, settings);
+            }
         } else if (state == State.CONNECTING) {
             inspectConnectionScreen(client, settings);
         }
@@ -120,6 +132,7 @@ public final class ReconnectController {
     private void inspectConnectionScreen(Minecraft client, ReconnectSettings settings) {
         Screen screen = client.gui.screen();
         if (screen instanceof DisconnectedScreen && screen != previousDisconnectScreen) {
+            previousDisconnectScreen = screen;
             scheduleRetry(settings);
         } else if (screen == previousDisconnectScreen || screen instanceof TitleScreen) {
             clear();
