@@ -15,6 +15,7 @@ public final class ModConfig {
     public int schemaVersion = 1;
     public ReconnectSettings reconnect = new ReconnectSettings();
     public AntiAfkSettings antiAfk = new AntiAfkSettings();
+    public AutoWelcomeSettings autoWelcome = new AutoWelcomeSettings();
     public List<String> afterReconnectMessages = new ArrayList<>(
         Collections.nCopies(5, "")
     );
@@ -27,8 +28,11 @@ public final class ModConfig {
         if (schemaVersion != 1) {
             return "Unsupported configuration version.";
         }
-        if (reconnect == null || antiAfk == null) {
-            return "Reconnect and anti-AFK settings are required.";
+        if (reconnect == null || antiAfk == null || autoWelcome == null) {
+            return "Reconnect, anti-AFK, and auto-welcome settings are required.";
+        }
+        if (!inRange(autoWelcome.delaySeconds, 1, 3600)) {
+            return "Auto Welcome delay must be between 1 and 3600 seconds.";
         }
         if (reconnect.serverAddress == null || reconnect.serverAddress.length() > 255) {
             return "Server address must contain at most 255 characters.";
