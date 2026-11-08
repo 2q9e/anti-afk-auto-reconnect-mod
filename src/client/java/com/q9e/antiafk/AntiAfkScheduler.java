@@ -26,8 +26,14 @@ public final class AntiAfkScheduler {
     private boolean running;
 
     public void reset(Minecraft client) {
-        boolean blocked = client.gui.screen() != null || client.player == null || client.level == null;
+        boolean overlayBlocked = client.gui.overlay() != null;
+        boolean blocked = client.gui.screen() != null || client.player == null
+            || client.level == null || overlayBlocked;
         if (blocked) {
+            if (overlayBlocked) {
+                // Vanilla does not clear queued mappings when it installs an overlay.
+                KeyMapping.releaseAll();
+            }
             while (client.options.keyAttack.consumeClick()) {
                 // Discard stale left-clicks that cannot be handled while gameplay is blocked.
             }
