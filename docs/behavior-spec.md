@@ -17,6 +17,15 @@ Target platform: Minecraft Java Edition 26.3, Fabric Loader 0.20.1, Java 25 or n
 - After an automatic reconnect succeeds, send up to five configured, nonblank chat lines or commands once, in their listed order.
 - Lines beginning with `/` are commands; other lines are regular chat. Send each line through the normal client chat or command path, one second apart.
 
+## Auto Welcome
+
+- Auto Welcome is disabled by default and has a configurable delay from 1 to 3600 seconds.
+- Inspect player-sent signed chat text only. Match the substring `welcome` case-insensitively, even when it appears inside a longer string.
+- Ignore system messages and messages sent by the local player.
+- For the first accepted match, wait the configured delay, then send exactly `welcome` through the normal client chat path.
+- Ignore matches while a reply is pending. After sending a reply, wait the same delay before accepting another match; do not queue matches during that interval.
+- Auto Welcome and post-reconnect chat or command lines share a per-client-tick send gate. At most one of these mod-initiated chat or command actions is dispatched in a client tick.
+
 ## Anti-AFK
 
 - Wait the configured start delay before the first action.
