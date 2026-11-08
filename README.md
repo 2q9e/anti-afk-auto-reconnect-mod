@@ -41,7 +41,21 @@ The artifacts are written to:
 - `versions/1.21.11/build/libs/`
 - `versions/1.21.4/build/libs/`
 
-GitHub Actions builds all five version projects on pushes and pull requests.
+GitHub Actions builds all five version projects on pushes to `main` and pull requests.
+
+## GitHub Releases
+
+Each Minecraft target has its own GitHub Release with the matching JAR attached. Push a tag in the form `minecraft-<minecraft-version>-v<mod-version>`; the version must match that module's `mod_version` in `gradle.properties`. The release workflow builds and validates only the matching module before publishing the JAR.
+
+The initial releases use these tags:
+
+- `minecraft-1.21.4-v0.1.0`
+- `minecraft-1.21.11-v0.1.0`
+- `minecraft-26.1-v0.1.0`
+- `minecraft-26.2-v0.1.0`
+- `minecraft-26.3-v0.1.0`
+
+Tag pushes use the versioned release workflow; the regular build workflow does not run for tag pushes.
 
 ## Network and input behavior
 

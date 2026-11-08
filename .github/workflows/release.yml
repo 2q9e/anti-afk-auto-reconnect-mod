@@ -1,0 +1,101 @@
+name: Publish Minecraft version release
+
+on:
+  push:
+    tags:
+      - 'minecraft-1.21.4-v*'
+      - 'minecraft-1.21.11-v*'
+      - 'minecraft-26.1-v*'
+      - 'minecraft-26.2-v*'
+      - 'minecraft-26.3-v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out tagged commit
+        uses: actions/checkout@v4
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: gradle
+
+      - name: Resolve and validate release target
+        id: target
+        shell: bash
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+
+          case "$TAG_NAME" in
+            minecraft-1.21.4-v*) minecraft_version="1.21.4"; project_dir="1.21.4" ;;
+            minecraft-1.21.11-v*) minecraft_version="1.21.11"; project_dir="1.21.11" ;;
+            minecraft-26.1-v*) minecraft_version="26.1"; project_dir="26.1" ;;
+            minecraft-26.2-v*) minecraft_version="26.2"; project_dir="26.2" ;;
+            minecraft-26.3-v*) minecraft_version="26.3"; project_dir="26.3" ;;
+            *) echo "Unsupported release tag: $TAG_NAME" >&2; exit 1 ;;
+          esac
+
+          mod_version="$(sed -n 's/^mod_version=//p' "versions/$project_dir/gradle.properties" | head -n 1)"
+          expected_tag="minecraft-${minecraft_version}-v${mod_version}"
+          if [[ "$TAG_NAME" != "$expected_tag" ]]; then
+            echo "Tag '$TAG_NAME' does not match the module version '$expected_tag'." >&2
+            exit 1
+          fi
+
+          jar_path="versions/$project_dir/build/libs/anti-afk-auto-reconnect-mod-${project_dir}-${mod_version}.jar"
+          echo "minecraft_version=$minecraft_version" >> "$GITHUB_OUTPUT"
+          echo "project_dir=$project_dir" >> "$GITHUB_OUTPUT"
+          echo "mod_version=$mod_version" >> "$GITHUB_OUTPUT"
+          echo "jar_path=$jar_path" >> "$GITHUB_OUTPUT"
+
+      - name: Build matching version
+        run: |
+          chmod +x gradlew
+          ./gradlew ":versions:${{ steps.target.outputs.project_dir }}:build" --no-daemon
+
+      - name: Verify release JAR metadata
+        shell: bash
+        env:
+          JAR_PATH: ${{ steps.target.outputs.jar_path }}
+          MOD_VERSION: ${{ steps.target.outputs.mod_version }}
+        run: |
+          set -euo pipefail
+          test -f "$JAR_PATH"
+          unzip -p "$JAR_PATH" fabric.mod.json | jq -e \
+            --arg mod_version "$MOD_VERSION" \
+            '.id == "anti_afk_reconnect" and .version == $mod_version and .environment == "client" and (.entrypoints.client | index("com.q9e.antiafk.AntiAfkClient") != null)' \
+            > /dev/null
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JAR_PATH: ${{ steps.target.outputs.jar_path }}
+          MINECRAFT_VERSION: ${{ steps.target.outputs.minecraft_version }}
+          MOD_VERSION: ${{ steps.target.outputs.mod_version }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          notes_file="$(mktemp)"
+          trap 'rm -f "$notes_file"' EXIT
+          printf '%s\n' \
+            "Anti-AFK and Auto Reconnect Mod v${MOD_VERSION} for Minecraft ${MINECRAFT_VERSION}." \
+            "" \
+            "Install this JAR with Fabric Loader and Fabric API for Minecraft ${MINECRAFT_VERSION}." \
+            "" \
+            "The 26.1 release is built against Minecraft 26.1.2 and verified against 26.1, 26.1.1, and 26.1.2." \
+            > "$notes_file"
+
+          gh release create "$RELEASE_TAG" "$JAR_PATH" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Anti-AFK and Auto Reconnect v${MOD_VERSION} for Minecraft ${MINECRAFT_VERSION}" \
+            --notes-file "$notes_file" \
+            --verify-tag
