@@ -11,10 +11,12 @@ public final class AutomationInput {
     private final Set<KeyMapping> heldMappings = Collections.newSetFromMap(new IdentityHashMap<>());
 
     public boolean tap(KeyMapping mapping) {
-        if (mapping.isDown()) {
+        if (mapping.isDown() || mapping.isUnbound()) {
             return false;
         }
-        return queueClick(mapping);
+        mapping.setDown(true);
+        heldMappings.add(mapping);
+        return true;
     }
 
     public boolean queueClick(KeyMapping mapping) {
