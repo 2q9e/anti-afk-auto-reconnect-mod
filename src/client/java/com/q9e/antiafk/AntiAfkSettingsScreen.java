@@ -9,13 +9,19 @@ import java.util.function.Consumer;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.ScrollableLayout;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
+import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 public final class AntiAfkSettingsScreen extends Screen {
     private final Screen parent;
     private final ModConfig draft;
-
+    private HeaderAndFooterLayout layout;
+    private ScrollableLayout scrollArea;
+    private LinearLayout form;
     private EditBox startDelay;
     private EditBox jumpInterval;
     private EditBox hitInterval;
@@ -40,7 +46,13 @@ public final class AntiAfkSettingsScreen extends Screen {
     @Override
     protected void init() {
         AntiAfkSettings settings = draft.antiAfk;
-        int left = Math.max(16, width / 2 - 205);
+        int widgetWidth = Math.max(120, Math.min(360, width - 64));
+        int buttonWidth = Math.max(110, Math.min(240, width - 64));
+
+        layout = new HeaderAndFooterLayout(this, 32, 42);
+        layout.addTitleHeader(title, font);
+        form = LinearLayout.vertical().spacing(5);
+        form.defaultCellSetting().alignHorizontallyLeft();
 
         antiAfkEnabled = settings.enabled;
         jumpEnabled = settings.jump.enabled;
@@ -48,56 +60,80 @@ public final class AntiAfkSettingsScreen extends Screen {
         crouchEnabled = settings.crouch.enabled;
         moveEnabled = settings.move.enabled;
 
-        addRenderableWidget(toggle(left, 44, 145, "Anti-AFK", () -> antiAfkEnabled, value -> antiAfkEnabled = value));
-        startDelay = field(left + 255, 57, 100, settings.startDelaySeconds);
+        addToggle("Anti-AFK", buttonWidth, () -> antiAfkEnabled, value -> antiAfkEnabled = value);
+        addLabel("Start delay (seconds)");
+        startDelay = numberField(settings.startDelaySeconds, 110, "Start delay");
+        addLabel("Jump");
+        addToggle("Jump", buttonWidth, () -> jumpEnabled, value -> jumpEnabled = value);
+        addLabel("Jump interval (seconds)");
+        jumpInterval = numberField(settings.jump.intervalSeconds, 110, "Jump interval");
+        addLabel("Hit (one-second left-click hold)");
+        addToggle("Hit", buttonWidth, () -> hitEnabled, value -> hitEnabled = value);
+        addLabel("Hit interval (seconds)");
+        hitInterval = numberField(settings.hit.intervalSeconds, 110, "Hit interval");
+        addLabel("Crouch");
+        addToggle("Crouch", buttonWidth, () -> crouchEnabled, value -> crouchEnabled = value);
+        addLabel("Crouch interval (seconds)");
+        crouchInterval = numberField(settings.crouch.intervalSeconds, 110, "Crouch interval");
+        addLabel("Crouch hold duration (seconds)");
+        crouchDuration = numberField(settings.crouch.durationSeconds, 110, "Crouch duration");
+        addLabel("Move");
+        addToggle("Move", buttonWidth, () -> moveEnabled, value -> moveEnabled = value);
+        addLabel("Move interval (seconds)");
+        moveInterval = numberField(settings.move.intervalSeconds, 110, "Move interval");
+        addLabel("Move hold duration (seconds)");
+        moveDuration = numberField(settings.move.durationSeconds, 110, "Move duration");
+        addLabel("Movement sequence, comma-separated");
+        movementOrder = textField(
+            String.join(", ", settings.movementOrder.stream().map(Enum::name).toList()),
+            widgetWidth,
+            "Movement sequence"
+        );
 
-        addRenderableWidget(toggle(left, 101, 130, "Jump", () -> jumpEnabled, value -> jumpEnabled = value));
-        jumpInterval = field(left + 160, 114, 86, settings.jump.intervalSeconds);
+        scrollArea = new ScrollableLayout(minecraft, form, layout.getContentHeight());
+        scrollArea.setMinWidth(Math.min(width - 32, 360));
+        layout.addToContents(scrollArea);
 
-        addRenderableWidget(toggle(left, 151, 130, "Hit (1 second)", () -> hitEnabled, value -> hitEnabled = value));
-        hitInterval = field(left + 160, 164, 86, settings.hit.intervalSeconds);
+        LinearLayout footer = LinearLayout.horizontal().spacing(8);
+        footer.addChild(Button.builder(Component.literal("Apply"), button -> apply())
+            .bounds(0, 0, 92, 24).build());
+        footer.addChild(Button.builder(Component.literal("Cancel"), button -> minecraft.gui.setScreen(parent))
+            .bounds(0, 0, 92, 24).build());
+        layout.addToFooter(footer);
 
-        addRenderableWidget(toggle(left, 201, 130, "Crouch", () -> crouchEnabled, value -> crouchEnabled = value));
-        crouchInterval = field(left + 160, 214, 86, settings.crouch.intervalSeconds);
-        crouchDuration = field(left + 270, 214, 86, settings.crouch.durationSeconds);
-
-        addRenderableWidget(toggle(left, 251, 130, "Move", () -> moveEnabled, value -> moveEnabled = value));
-        moveInterval = field(left + 160, 264, 86, settings.move.intervalSeconds);
-        moveDuration = field(left + 270, 264, 86, settings.move.durationSeconds);
-
-        movementOrder = new EditBox(font, left, 319, 356, 20, Component.literal("Movement order"));
-        movementOrder.setMaxLength(256);
-        movementOrder.setValue(String.join(", ", settings.movementOrder.stream().map(Enum::name).toList()));
-        addRenderableWidget(movementOrder);
-
-        addRenderableWidget(Button.builder(Component.literal("Apply"), button -> apply())
-            .bounds(width / 2 - 105, height - 38, 100, 24).build());
-        addRenderableWidget(Button.builder(Component.literal("Cancel"), button -> minecraft.gui.setScreen(parent))
-            .bounds(width / 2 + 5, height - 38, 100, 24).build());
+        repositionElements();
+        layout.visitWidgets(this::addRenderableWidget);
     }
 
-    private Button toggle(
-        int x,
-        int y,
-        int buttonWidth,
-        String label,
-        BooleanSupplier read,
-        Consumer<Boolean> write
-    ) {
+    private void addLabel(String text) {
+        StringWidget label = new StringWidget(Component.literal(text), font)
+            .setMaxWidth(Math.max(120, width - 48));
+        form.addChild(label);
+    }
+
+    private void addToggle(String label, int buttonWidth, BooleanSupplier read, Consumer<Boolean> write) {
         Button[] reference = new Button[1];
         reference[0] = Button.builder(toggleMessage(label, read.getAsBoolean()), button -> {
             boolean nextValue = !read.getAsBoolean();
             write.accept(nextValue);
             button.setMessage(toggleMessage(label, nextValue));
-        }).bounds(x, y, buttonWidth, 22).build();
-        return reference[0];
+        }).bounds(0, 0, buttonWidth, 22).build();
+        form.addChild(reference[0]);
     }
 
-    private EditBox field(int x, int y, int fieldWidth, int value) {
-        EditBox field = new EditBox(font, x, y, fieldWidth, 20, Component.empty());
-        field.setMaxLength(8);
-        field.setValue(Integer.toString(value));
-        addRenderableWidget(field);
+    private EditBox numberField(int value, int fieldWidth, String narration) {
+        return textField(Integer.toString(value), fieldWidth, narration, 8);
+    }
+
+    private EditBox textField(String value, int fieldWidth, String narration) {
+        return textField(value, fieldWidth, narration, 256);
+    }
+
+    private EditBox textField(String value, int fieldWidth, String narration, int maxLength) {
+        EditBox field = new EditBox(font, 0, 0, fieldWidth, 20, Component.literal(narration));
+        field.setMaxLength(maxLength);
+        field.setValue(value);
+        form.addChild(field);
         return field;
     }
 
@@ -164,6 +200,20 @@ public final class AntiAfkSettingsScreen extends Screen {
     }
 
     @Override
+    protected void repositionElements() {
+        if (layout == null || scrollArea == null) {
+            return;
+        }
+        form.arrangeElements();
+        scrollArea.arrangeElements();
+        scrollArea.setMaxHeight(layout.getContentHeight());
+        scrollArea.setMinHeight(layout.getContentHeight());
+        layout.arrangeElements();
+        scrollArea.setX((width - scrollArea.getWidth()) / 2);
+        scrollArea.setY(layout.getHeaderHeight());
+    }
+
+    @Override
     public void extractRenderState(
         GuiGraphicsExtractor graphics,
         int mouseX,
@@ -171,17 +221,8 @@ public final class AntiAfkSettingsScreen extends Screen {
         float delta
     ) {
         super.extractRenderState(graphics, mouseX, mouseY, delta);
-        int left = Math.max(16, width / 2 - 205);
-        graphics.text(font, "Start delay (seconds)", left + 255, 45, 0xFFFFFFFF, true);
-        graphics.text(font, "Interval (seconds)", left + 160, 93, 0xFFFFFFFF, true);
-        graphics.text(font, "Interval (seconds)", left + 160, 143, 0xFFFFFFFF, true);
-        graphics.text(font, "Interval (seconds)", left + 160, 193, 0xFFFFFFFF, true);
-        graphics.text(font, "Duration (seconds)", left + 270, 193, 0xFFFFFFFF, true);
-        graphics.text(font, "Interval (seconds)", left + 160, 243, 0xFFFFFFFF, true);
-        graphics.text(font, "Duration (seconds)", left + 270, 243, 0xFFFFFFFF, true);
-        graphics.text(font, "Movement sequence (comma-separated)", left, 298, 0xFFFFFFFF, true);
         if (!status.isEmpty()) {
-            graphics.text(font, status, 18, height - 62, 0xFFFF5555, true);
+            graphics.text(font, status, 12, height - 56, 0xFFFF5555, true);
         }
     }
 
