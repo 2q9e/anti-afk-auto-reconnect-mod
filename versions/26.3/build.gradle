@@ -20,6 +20,8 @@ repositories {
 }
 
 loom {
+    accessWidenerPath = file('src/main/resources/anti_afk_reconnect.classtweaker')
+
     splitEnvironmentSourceSets()
 
     mods {
