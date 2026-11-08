@@ -3,7 +3,7 @@
   "id": "anti_afk_reconnect",
   "version": "${version}",
   "name": "Anti-AFK and Auto Reconnect",
-  "description": "Timed anti-AFK actions and configurable reconnect settings for Minecraft Java.",
+  "description": "Timed anti-AFK actions, reconnect settings, and optional Auto Welcome replies for Minecraft Java.",
   "authors": [
     "2q9e"
   ],
