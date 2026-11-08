@@ -57,7 +57,8 @@ public final class AntiAfkScheduler {
     public void tick(Minecraft client, AntiAfkSettings settings) {
         tick++;
         if (settings == null || !settings.enabled || client.player == null
-            || client.level == null || client.gui.screen() != null) {
+            || client.level == null || client.gui.screen() != null
+            || client.gui.overlay() != null) {
             reset(client);
             return;
         }
