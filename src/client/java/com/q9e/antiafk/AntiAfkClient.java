@@ -6,6 +6,7 @@ import java.util.Objects;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.KeyMapping;
@@ -18,7 +19,9 @@ public final class AntiAfkClient implements ClientModInitializer {
     );
 
     private final AntiAfkScheduler scheduler = new AntiAfkScheduler();
-    private final ReconnectController reconnectController = new ReconnectController();
+    private final ClientChatSendGate chatSendGate = new ClientChatSendGate();
+    private final ReconnectController reconnectController = new ReconnectController(chatSendGate);
+    private final AutoWelcomeController autoWelcomeController = new AutoWelcomeController(chatSendGate);
     private ModConfig config;
     private KeyMapping openSettingsKey;
 
@@ -39,9 +42,23 @@ public final class AntiAfkClient implements ClientModInitializer {
         ClientPlayConnectionEvents.DISCONNECT.register(
             (listener, client) -> reconnectController.onPlayDisconnect(client, config.reconnect)
         );
+        ClientReceiveMessageEvents.CHAT.register((message, signedMessage, sender, chatType, receptionTimestamp) -> {
+            if (signedMessage == null || sender == null) {
+                return;
+            }
+            Minecraft client = Minecraft.getInstance();
+            String signedContent = signedMessage.signedContent();
+            client.execute(() -> autoWelcomeController.onChatMessage(
+                client,
+                sender.getId(),
+                signedContent,
+                config.autoWelcome
+            ));
+        });
     }
 
     private void onEndClientTick(Minecraft client) {
+        chatSendGate.beginTick();
         while (openSettingsKey.consumeClick()) {
             if (client.gui.screen() == null) {
                 client.gui.setScreen(
@@ -51,6 +68,7 @@ public final class AntiAfkClient implements ClientModInitializer {
         }
 
         reconnectController.tick(client, config.reconnect);
+        autoWelcomeController.tick(client, config.autoWelcome);
         scheduler.tick(client, config.antiAfk);
     }
 
@@ -65,6 +83,7 @@ public final class AntiAfkClient implements ClientModInitializer {
 
         boolean antiAfkChanged = !sameAntiAfk(config.antiAfk, updated.antiAfk);
         boolean reconnectChanged = !sameReconnect(config.reconnect, updated.reconnect);
+        boolean autoWelcomeChanged = !sameAutoWelcome(config.autoWelcome, updated.autoWelcome);
 
         try {
             ConfigStore.save(updated);
@@ -78,6 +97,9 @@ public final class AntiAfkClient implements ClientModInitializer {
         }
         if (reconnectChanged) {
             reconnectController.onSettingsChanged(config.reconnect);
+        }
+        if (autoWelcomeChanged) {
+            autoWelcomeController.onSettingsChanged();
         }
         return null;
     }
@@ -101,6 +123,10 @@ public final class AntiAfkClient implements ClientModInitializer {
         return left.enabled == right.enabled
             && left.intervalSeconds == right.intervalSeconds
             && left.durationSeconds == right.durationSeconds;
+    }
+
+    private static boolean sameAutoWelcome(AutoWelcomeSettings left, AutoWelcomeSettings right) {
+        return left.enabled == right.enabled && left.delaySeconds == right.delaySeconds;
     }
 
     private static boolean sameReconnect(ReconnectSettings left, ReconnectSettings right) {
