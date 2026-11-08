@@ -2,7 +2,7 @@
 
 A client-side Fabric mod for timed anti-AFK actions, reconnecting to a configured Minecraft server, and replying to player chat with Auto Welcome.
 
-The mod runs locally in the Minecraft client and requires no separate VPS or hosted service. Reconnect connects directly to the player's configured Minecraft server through the normal game client.
+The mod's settings and feature logic run locally on your device. The mod itself makes no connections to external services and uses no VPS, remote control server, telemetry, or analytics. During normal Minecraft use, the game client connects to Microsoft/Mojang services for account and session functions and to the Minecraft server you choose to join.
 
 ## Supported Minecraft versions
 
@@ -63,7 +63,7 @@ Tag pushes use the versioned release workflow; the regular build workflow does n
 
 ## Network and input behavior
 
-The mod uses ordinary key mappings, the vanilla reconnect flow, and vanilla chat or command submission. It does not construct or reorder gameplay packets. Auto Welcome and post-reconnect chat or command lines share a client-tick gate, so the mod dispatches at most one of those chat or command actions per client tick.
+The mod's configuration and feature logic run locally. Its reconnect and chat actions use Minecraft's normal client connection; the mod does not open a separate connection to a third-party service. The Minecraft client communicates with Microsoft/Mojang services as needed for account and session functions and with the Minecraft server you choose to join. The mod uses ordinary key mappings, the vanilla reconnect flow, and vanilla chat or command submission. It does not construct or reorder gameplay packets. Auto Welcome and post-reconnect chat or command lines share a client-tick gate, so the mod dispatches at most one of those chat or command actions per client tick.
 
 ## Reuse and credit
 
