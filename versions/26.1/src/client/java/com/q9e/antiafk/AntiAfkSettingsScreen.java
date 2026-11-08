@@ -7,6 +7,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.AbstractScrollArea;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ScrollableLayout;
@@ -16,6 +17,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.network.chat.Component;
 
 public final class AntiAfkSettingsScreen extends Screen {
@@ -219,8 +221,21 @@ public final class AntiAfkSettingsScreen extends Screen {
     private void restoreFocusedChild() {
         if (getFocused() instanceof ContainerEventHandler focusContainer) {
             GuiEventListener focusedChild = focusContainer.getFocused();
-            if (focusedChild != null) {
-                focusContainer.setFocused(focusedChild);
+            if (focusedChild == null) {
+                return;
+            }
+
+            focusContainer.setFocused(focusedChild);
+            if (focusContainer instanceof AbstractScrollArea scrollContainer) {
+                ScreenRectangle area = scrollContainer.getRectangle();
+                ScreenRectangle focusedRect = focusedChild.getRectangle();
+                int topDelta = focusedRect.top() - area.top();
+                int bottomDelta = focusedRect.bottom() - area.bottom();
+                if (topDelta < 0) {
+                    scrollContainer.setScrollAmount(scrollContainer.getScrollAmount() + topDelta - 10);
+                } else if (bottomDelta > 0) {
+                    scrollContainer.setScrollAmount(scrollContainer.getScrollAmount() + bottomDelta + 10);
+                }
             }
         }
     }
