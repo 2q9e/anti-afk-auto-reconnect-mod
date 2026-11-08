@@ -11,8 +11,9 @@ Target platform: Minecraft Java Edition 26.3, Fabric Loader 0.20.1, Java 25 or n
 ## Reconnect
 
 - Store one configured server address, a first retry delay, and a subsequent retry delay.
+- Start retry scheduling after a play disconnect produces the vanilla disconnect screen; a return to the title screen cancels the retry flow.
 - Wait the first delay before the first retry, then use the subsequent delay for later failed retries.
-- Start the retry flow only after a disconnect screen; do not start it on game launch.
+- Schedule no more than one retry or connection attempt at a time.
 - After an automatic reconnect succeeds, send up to five configured, nonblank chat lines or commands once, in their listed order.
 - Lines beginning with `/` are commands; other lines are regular chat. Send each line through the normal client chat or command path, one second apart.
 
@@ -24,9 +25,9 @@ Target platform: Minecraft Java Edition 26.3, Fabric Loader 0.20.1, Java 25 or n
 - Hit is held for one second when its interval expires and follows the current vanilla left-click target: air, a block, or an entity. Normal game targeting and block occlusion decide what is hit.
 - Crouch and Move each have an interval and a hold duration. A hold duration must not exceed its interval.
 - Move follows an editable sequence; the initial sequence is forward, left, right, left.
-- Release automated key states when the feature is disabled or the player leaves the world.
+- Release automated key states when the feature is disabled, the player leaves the world, or a blocking screen is open.
 
-## Input handling
+## Input and connection handling
 
 - Use ordinary client key mappings and the normal client interaction flow.
 - Do not construct or reorder gameplay packets for anti-AFK actions.
