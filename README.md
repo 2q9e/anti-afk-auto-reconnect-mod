@@ -8,8 +8,9 @@ A client-side Fabric mod for timed anti-AFK actions, reconnecting to a configure
 | --- | --- | --- | --- |
 | 26.3 | 0.165.2+26.3 | 25 | [versions/26.3](versions/26.3) |
 | 1.21.11 | 0.141.6+1.21.11 | 21 | [versions/1.21.11](versions/1.21.11) |
+| 1.21.4 | 0.119.4+1.21.4 | 21 | [versions/1.21.4](versions/1.21.4) |
 
-Each version is an independent Gradle project with its own dependencies, mod metadata, resources, and Minecraft-specific client code. Shared configuration models and storage live under `shared/`. The root Gradle project builds both versions.
+Each version is an independent Gradle project with its own dependencies, mod metadata, resources, and Minecraft-specific client code. Shared configuration models and storage live under `shared/`. The root Gradle project builds all three versions.
 
 ## Features
 
@@ -28,14 +29,15 @@ Settings are stored locally in `config/anti-afk-auto-reconnect.json`. All featur
 
 ## Build
 
-Run `./gradlew build` from the repository root to build both JARs. Fabric Loom 1.19.4 requires Java 25 to run Gradle. The 1.21.11 artifact is compiled for Java 21, and the 26.3 artifact is compiled for Java 25.
+Run `./gradlew build` from the repository root to build all three JARs. Fabric Loom 1.19.4 requires Java 25 to run Gradle. The 1.21.4 and 1.21.11 artifacts are compiled for Java 21, and the 26.3 artifact is compiled for Java 25.
 
 The artifacts are written to:
 
 - `versions/26.3/build/libs/`
 - `versions/1.21.11/build/libs/`
+- `versions/1.21.4/build/libs/`
 
-GitHub Actions builds both version projects on pushes and pull requests.
+GitHub Actions builds all three version projects on pushes and pull requests.
 
 ## Network and input behavior
 
