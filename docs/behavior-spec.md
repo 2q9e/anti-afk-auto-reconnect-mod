@@ -25,7 +25,8 @@ Target platform: Minecraft Java Edition 26.3, Fabric Loader 0.20.1, Java 25 or n
 - Hit is held for one second when its interval expires and follows the current vanilla left-click target: air, a block, or an entity. Normal game targeting and block occlusion decide what is hit.
 - Crouch and Move each have an interval and a hold duration. A hold duration must not exceed its interval.
 - Move follows an editable sequence; the initial sequence is forward, left, right, left.
-- Release automated key states when the feature is disabled, the player leaves the world, or a blocking screen is open.
+- When automation is disabled, the player leaves the world, or a blocking screen opens, release automated keys and discard any queued automated attack click.
+- After a blocking screen closes, restart the full configured start delay and begin the movement sequence from its first direction.
 
 ## Input and connection handling
 
