@@ -34,9 +34,12 @@ public final class ModConfig {
         if (reconnect.enabled && reconnect.serverAddress.isBlank()) {
             return "Enter a server address before enabling auto-reconnect.";
         }
-        if (!inRange(reconnect.firstRetryDelaySeconds, 0, 3600)
-            || !inRange(reconnect.subsequentRetryDelaySeconds, 0, 3600)) {
-            return "Reconnect delays must be between 0 and 3600 seconds.";
+        if (!reconnect.serverAddress.isBlank() && !isValidServerAddress(reconnect.serverAddress)) {
+            return "Enter a host or IP address, with an optional valid port.";
+        }
+        if (!inRange(reconnect.firstRetryDelaySeconds, 1, 3600)
+            || !inRange(reconnect.subsequentRetryDelaySeconds, 1, 3600)) {
+            return "Reconnect delays must be between 1 and 3600 seconds.";
         }
         if (!inRange(antiAfk.startDelaySeconds, 0, 86400)) {
             return "Anti-AFK start delay must be between 0 and 86400 seconds.";
@@ -51,8 +54,9 @@ public final class ModConfig {
         if (!validTimedAction(antiAfk.crouch) || !validTimedAction(antiAfk.move)) {
             return "Crouch and Move durations must be at least 1 second and no greater than their intervals.";
         }
-        if (antiAfk.movementOrder == null || antiAfk.movementOrder.isEmpty()) {
-            return "Movement order must contain at least one direction.";
+        if (antiAfk.movementOrder == null || antiAfk.movementOrder.isEmpty()
+            || antiAfk.movementOrder.size() > 16) {
+            return "Movement order must contain between 1 and 16 directions.";
         }
         if (antiAfk.movementOrder.stream().anyMatch(direction -> direction == null)) {
             return "Movement order contains an unknown direction.";
@@ -64,6 +68,67 @@ public final class ModConfig {
             return "Each post-reconnect line must be 256 characters or fewer.";
         }
         return null;
+    }
+
+    private static boolean isValidServerAddress(String value) {
+        String address = value.trim();
+        if (address.isEmpty() || address.chars().anyMatch(Character::isWhitespace)
+            || address.chars().anyMatch(Character::isISOControl)
+            || address.contains("/") || address.contains("\\")
+            || address.contains("://")) {
+            return false;
+        }
+
+        String host;
+        String port = null;
+        if (address.startsWith("[")) {
+            int closingBracket = address.indexOf(']');
+            if (closingBracket <= 1) {
+                return false;
+            }
+            host = address.substring(1, closingBracket);
+            String suffix = address.substring(closingBracket + 1);
+            if (!suffix.isEmpty()) {
+                if (!suffix.startsWith(":")) {
+                    return false;
+                }
+                port = suffix.substring(1);
+            }
+            if (!host.contains(":") || !host.matches("[0-9A-Fa-f:.%_-]+")) {
+                return false;
+            }
+        } else {
+            long colonCount = address.chars().filter(character -> character == ':').count();
+            if (colonCount == 1) {
+                int colon = address.indexOf(':');
+                host = address.substring(0, colon);
+                port = address.substring(colon + 1);
+            } else {
+                host = address;
+                if (colonCount > 1 && !host.matches("[0-9A-Fa-f:.%_-]+")) {
+                    return false;
+                }
+            }
+            if (host.isEmpty()) {
+                return false;
+            }
+            if (colonCount <= 1 && !host.matches("[A-Za-z0-9._-]+")) {
+                return false;
+            }
+        }
+
+        if (port != null) {
+            if (port.isEmpty() || !port.chars().allMatch(Character::isDigit)) {
+                return false;
+            }
+            try {
+                int number = Integer.parseInt(port);
+                return inRange(number, 1, 65535);
+            } catch (NumberFormatException exception) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static boolean validTimedAction(TimedActionSettings action) {
