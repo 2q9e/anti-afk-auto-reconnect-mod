@@ -180,9 +180,9 @@ public final class ReconnectSettingsScreen extends Screen {
                 int topDelta = focusedRect.top() - area.top();
                 int bottomDelta = focusedRect.bottom() - area.bottom();
                 if (topDelta < 0) {
-                    scrollContainer.setScrollAmount(scrollContainer.getScrollAmount() + topDelta - 10);
+                    scrollContainer.setScrollAmount(scrollContainer.scrollAmount() + topDelta - 10);
                 } else if (bottomDelta > 0) {
-                    scrollContainer.setScrollAmount(scrollContainer.getScrollAmount() + bottomDelta + 10);
+                    scrollContainer.setScrollAmount(scrollContainer.scrollAmount() + bottomDelta + 10);
                 }
             }
         }
