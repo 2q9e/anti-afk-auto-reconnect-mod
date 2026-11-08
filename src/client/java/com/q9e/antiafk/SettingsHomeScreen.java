@@ -27,17 +27,21 @@ public final class SettingsHomeScreen extends Screen {
 
         addRenderableWidget(Button.builder(Component.literal("Anti-AFK settings"), button ->
             minecraft.gui.setScreen(new AntiAfkSettingsScreen(this, draft))
-        ).bounds(left, height / 2 - 65, buttonWidth, 24).build());
+        ).bounds(left, height / 2 - 82, buttonWidth, 24).build());
 
         addRenderableWidget(Button.builder(Component.literal("Auto reconnect settings"), button ->
             minecraft.gui.setScreen(new ReconnectSettingsScreen(this, draft))
-        ).bounds(left, height / 2 - 32, buttonWidth, 24).build());
+        ).bounds(left, height / 2 - 49, buttonWidth, 24).build());
+
+        addRenderableWidget(Button.builder(Component.literal("Auto Welcome settings"), button ->
+            minecraft.gui.setScreen(new AutoWelcomeSettingsScreen(this, draft))
+        ).bounds(left, height / 2 - 16, buttonWidth, 24).build());
 
         addRenderableWidget(Button.builder(Component.literal("Save"), button -> save())
-            .bounds(left, height / 2 + 18, 105, 24).build());
+            .bounds(left, height / 2 + 24, 105, 24).build());
         addRenderableWidget(Button.builder(Component.literal("Cancel"), button ->
             minecraft.gui.setScreen(parent)
-        ).bounds(left + 115, height / 2 + 18, 105, 24).build());
+        ).bounds(left + 115, height / 2 + 24, 105, 24).build());
     }
 
     private void save() {
