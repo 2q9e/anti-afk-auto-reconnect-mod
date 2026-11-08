@@ -128,7 +128,9 @@ public final class ReconnectController {
 
     private void checkDisconnectScreen(Minecraft client, ReconnectSettings settings) {
         Screen screen = client.gui.screen();
-        if (screen instanceof DisconnectedScreen) {
+        if (screen instanceof TitleScreen) {
+            clear();
+        } else if (screen instanceof DisconnectedScreen) {
             previousDisconnectScreen = screen;
             scheduleRetry(settings);
         } else if (tick >= disconnectCheckDeadline) {
