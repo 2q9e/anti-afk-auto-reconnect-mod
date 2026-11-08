@@ -1,0 +1,63 @@
+plugins {
+    id 'net.fabricmc.fabric-loom'
+}
+
+def versionProperties = new Properties()
+file('gradle.properties').withInputStream { versionProperties.load(it) }
+def versionProperty = { String name -> versionProperties.getProperty(name) }
+def javaVersion = versionProperty('java_version').toInteger()
+
+group = versionProperty('maven_group')
+version = versionProperty('mod_version')
+
+base {
+    archivesName = versionProperty('archives_base_name')
+}
+
+repositories {
+    maven { url = 'https://maven.fabricmc.net/' }
+    mavenCentral()
+}
+
+loom {
+    accessWidenerPath = file('src/main/resources/anti_afk_reconnect.classtweaker')
+
+    splitEnvironmentSourceSets()
+
+    mods {
+        'anti_afk_reconnect' {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.client
+        }
+    }
+}
+
+sourceSets.main.java.srcDir(rootProject.file('shared/src/main/java'))
+
+dependencies {
+    minecraft "com.mojang:minecraft:${versionProperty('minecraft_version')}"
+    implementation "net.fabricmc:fabric-loader:${versionProperty('loader_version')}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${versionProperty('fabric_api_version')}"
+}
+
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') {
+        expand 'version': project.version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = javaVersion
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(javaVersion)
+    withSourcesJar()
+}
+
+jar {
+    from(rootProject.file('LICENSE')) {
+        rename { "${it}_${project.name}" }
+    }
+}
