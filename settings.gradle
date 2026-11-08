@@ -14,5 +14,7 @@ pluginManagement {
 rootProject.name = 'anti-afk-auto-reconnect-mod'
 include 'versions:26.3'
 include 'versions:1.21.11'
+include 'versions:1.21.4'
 project(':versions:26.3').projectDir = file('versions/26.3')
 project(':versions:1.21.11').projectDir = file('versions/1.21.11')
+project(':versions:1.21.4').projectDir = file('versions/1.21.4')
