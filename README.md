@@ -1,12 +1,15 @@
 # Anti-AFK and Auto-Reconnect Mod
 
-A client-side Fabric mod for timed anti-AFK actions and reconnecting to a configured Minecraft server.
+A client-side Fabric mod for timed anti-AFK actions, reconnecting to a configured Minecraft server, and replying to player chat with Auto Welcome.
 
-## Target versions
+## Supported Minecraft versions
 
-- Minecraft Java Edition 26.3
-- Fabric Loader 0.20.1
-- Java 25 or newer
+| Minecraft | Fabric API | Java bytecode target | Project |
+| --- | --- | --- | --- |
+| 26.3 | 0.165.2+26.3 | 25 | [versions/26.3](versions/26.3) |
+| 1.21.11 | 0.141.6+1.21.11 | 21 | [versions/1.21.11](versions/1.21.11) |
+
+Each version is an independent Gradle project with its own dependencies, mod metadata, resources, and Minecraft-specific client code. Shared configuration models and storage live under `shared/`. The root Gradle project builds both versions.
 
 ## Features
 
@@ -19,13 +22,24 @@ A client-side Fabric mod for timed anti-AFK actions and reconnecting to a config
 - Edit the movement sequence. The default is `FORWARD, LEFT, RIGHT, LEFT`.
 - Reconnect to a configured address after an unexpected disconnect, with separate first and later retry delays.
 - After an automatic reconnect succeeds, send up to five configured chat messages or slash commands in order, one second apart.
-- Auto Welcome checks player chat for the substring `welcome`, ignoring letter case and word boundaries. It skips system messages and your own messages, waits the configured delay before replying `welcome`, then waits the same delay before accepting another match.
+- Auto Welcome matches the substring `welcome` in player chat without regard to letter case or word boundaries. It ignores system messages and your own messages, waits the configured delay before replying `welcome`, then waits the same delay before accepting another match.
 
-Auto Welcome and settings are stored locally in `config/anti-afk-auto-reconnect.json`. All features are disabled by default. Reconnect messages and Auto Welcome share a per-tick send gate, so the mod sends no more than one chat or command action on a client tick.
+Settings are stored locally in `config/anti-afk-auto-reconnect.json`. All features are disabled by default.
 
 ## Build
 
-Run `./gradlew build` on a Java 25 installation. The built mod JAR is in `build/libs`.
+Run `./gradlew build` from the repository root to build both JARs. Fabric Loom 1.19.4 requires Java 25 to run Gradle. The 1.21.11 artifact is compiled for Java 21, and the 26.3 artifact is compiled for Java 25.
+
+The artifacts are written to:
+
+- `versions/26.3/build/libs/`
+- `versions/1.21.11/build/libs/`
+
+GitHub Actions builds both version projects on pushes and pull requests.
+
+## Network and input behavior
+
+The mod uses ordinary key mappings, the vanilla reconnect flow, and vanilla chat or command submission. It does not construct or reorder gameplay packets. Auto Welcome and post-reconnect chat or command lines share a client-tick gate, so the mod dispatches at most one of those chat or command actions per client tick.
 
 ## Reuse and credit
 
