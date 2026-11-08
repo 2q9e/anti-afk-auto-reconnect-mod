@@ -26,12 +26,13 @@ public final class AntiAfkScheduler {
     private boolean running;
 
     public void reset(Minecraft client) {
-        if (client.gui.screen() != null || client.player == null || client.level == null) {
+        boolean blocked = client.gui.screen() != null || client.player == null || client.level == null;
+        if (blocked) {
             while (client.options.keyAttack.consumeClick()) {
                 // Discard stale left-clicks that cannot be handled while gameplay is blocked.
             }
         }
-        input.releaseAll();
+        input.releaseAll(!blocked);
         activeLevel = null;
         activeMoveDirection = null;
         movementIndex = 0;
