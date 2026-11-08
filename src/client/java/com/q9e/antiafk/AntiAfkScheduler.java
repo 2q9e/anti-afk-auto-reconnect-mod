@@ -13,6 +13,7 @@ public final class AntiAfkScheduler {
     private long tick;
     private long startAt;
     private long nextJumpAt;
+    private long jumpReleaseAt;
     private long nextHitAt;
     private long hitReleaseAt;
     private long nextCrouchAt;
@@ -31,6 +32,7 @@ public final class AntiAfkScheduler {
         movementIndex = 0;
         startAt = 0;
         nextJumpAt = 0;
+        jumpReleaseAt = 0;
         nextHitAt = 0;
         hitReleaseAt = 0;
         nextCrouchAt = 0;
@@ -69,6 +71,7 @@ public final class AntiAfkScheduler {
     private void begin(AntiAfkSettings settings) {
         startAt = tick + secondsToTicks(settings.startDelaySeconds);
         nextJumpAt = startAt;
+        jumpReleaseAt = 0;
         nextHitAt = startAt;
         nextCrouchAt = startAt;
         nextMoveAt = startAt;
@@ -81,6 +84,10 @@ public final class AntiAfkScheduler {
     }
 
     private void releaseExpiredInputs(Minecraft client) {
+        if (jumpReleaseAt > 0 && tick >= jumpReleaseAt) {
+            input.release(client.options.keyJump);
+            jumpReleaseAt = 0;
+        }
         if (hitReleaseAt > 0 && tick >= hitReleaseAt) {
             input.release(client.options.keyAttack);
             hitReleaseAt = 0;
@@ -99,7 +106,9 @@ public final class AntiAfkScheduler {
             return;
         }
 
-        input.tap(client.options.keyJump);
+        if (input.tap(client.options.keyJump)) {
+            jumpReleaseAt = tick + 1;
+        }
         nextJumpAt = tick + secondsToTicks(settings.jump.intervalSeconds);
     }
 
