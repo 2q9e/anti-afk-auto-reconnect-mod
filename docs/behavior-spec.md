@@ -24,6 +24,7 @@ Target platform: Minecraft Java Edition 26.3, Fabric Loader 0.20.1, Java 25 or n
 - Ignore system messages and messages sent by the local player.
 - For the first accepted match, wait the configured delay, then send exactly `welcome` through the normal client chat path.
 - Ignore matches while a reply is pending. After sending a reply, wait the same delay before accepting another match; do not queue matches during that interval.
+- Ignore chat received while a screen or overlay is open. If one opens after a match is accepted, pause the pending reply delay until gameplay resumes; the post-reply cooldown continues to count client ticks.
 - Auto Welcome and post-reconnect chat or command lines share a per-client-tick send gate. At most one of these mod-initiated chat or command actions is dispatched in a client tick.
 
 ## Anti-AFK
