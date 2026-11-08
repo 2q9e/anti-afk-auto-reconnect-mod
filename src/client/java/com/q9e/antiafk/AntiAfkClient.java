@@ -9,11 +9,11 @@ import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public final class AntiAfkClient implements ClientModInitializer {
     private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(
-        ResourceLocation.fromNamespaceAndPath("anti_afk_reconnect", "main")
+        Identifier.fromNamespaceAndPath("anti_afk_reconnect", "main")
     );
 
     private final AntiAfkScheduler scheduler = new AntiAfkScheduler();
