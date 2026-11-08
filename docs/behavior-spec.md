@@ -32,11 +32,12 @@ Target platforms: Minecraft Java Edition 26.3 (Fabric Loader 0.20.1, Java 25) an
 - Wait the configured start delay before the first action.
 - Jump, Hit, Crouch, and Move use independent timers and can overlap.
 - Jump is a single tap when its interval expires.
-- Hit is held for one second when its interval expires and follows the current vanilla left-click target: air, a block, or an entity. Normal game targeting and block occlusion decide what is hit.
+- Hit invokes Minecraft's normal attack routine once when its interval expires, then holds the vanilla attack key for one second. Minecraft's current hit result, item checks, target selection, and block occlusion decide the action. If the interval is one second, the scheduler leaves one client tick released between holds.
 - Crouch and Move each have an interval and a hold duration. A hold duration must not exceed its interval.
 - Move follows an editable sequence; the initial sequence is forward, left, right, left.
-- When automation is disabled, the player leaves the world, or a screen or overlay blocks gameplay, release automated keys and discard queued automated input clicks.
+- When automation is disabled, the player leaves the world, or a screen or overlay blocks gameplay, release automated keys. While gameplay is blocked, clear pending attack clicks so they cannot fire after resuming.
 - After a blocking screen or overlay closes, restart the full configured start delay and begin the movement sequence from its first direction.
+- Saving a changed Anti-AFK setting restarts all enabled action timers and applies the full start delay.
 
 ## Input and connection handling
 
