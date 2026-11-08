@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "anti_afk_reconnect",
+  "version": "${version}",
+  "name": "Anti-AFK and Auto Reconnect",
+  "description": "Timed anti-AFK actions, reconnect settings, and optional Auto Welcome replies for Minecraft Java.",
+  "authors": [
+    "2q9e"
+  ],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.q9e.antiafk.AntiAfkClient"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.20.1",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
