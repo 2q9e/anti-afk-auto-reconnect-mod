@@ -64,8 +64,9 @@ public final class ModConfig {
         if (afterReconnectMessages == null || afterReconnectMessages.size() > 5) {
             return "Configure no more than five post-reconnect chat lines.";
         }
-        if (afterReconnectMessages.stream().anyMatch(line -> line != null && line.length() > 256)) {
-            return "Each post-reconnect line must be 256 characters or fewer.";
+        if (afterReconnectMessages.stream().anyMatch(line -> line == null
+            || line.length() > 256 || line.chars().anyMatch(Character::isISOControl))) {
+            return "Each post-reconnect line must be single-line text of 256 characters or fewer.";
         }
         return null;
     }
