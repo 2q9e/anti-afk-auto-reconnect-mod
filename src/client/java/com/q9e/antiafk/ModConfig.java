@@ -99,7 +99,7 @@ public final class ModConfig {
                 }
                 port = suffix.substring(1);
             }
-            if (!host.contains(":") || !host.matches("[0-9A-Fa-f:.%_-]+")) {
+            if (!isValidIpv6Literal(host)) {
                 return false;
             }
         } else {
@@ -108,32 +108,102 @@ public final class ModConfig {
                 int colon = address.indexOf(':');
                 host = address.substring(0, colon);
                 port = address.substring(colon + 1);
+                if (!isValidHost(host)) {
+                    return false;
+                }
+            } else if (colonCount > 1) {
+                host = address;
+                if (!isValidIpv6Literal(host)) {
+                    return false;
+                }
             } else {
                 host = address;
-                if (colonCount > 1 && !host.matches("[0-9A-Fa-f:.%_-]+")) {
+                if (!isValidHost(host)) {
                     return false;
                 }
             }
-            if (host.isEmpty()) {
-                return false;
-            }
-            if (colonCount <= 1 && !host.matches("[A-Za-z0-9._-]+")) {
+        }
+
+        return port == null || isValidPort(port);
+    }
+
+    private static boolean isValidHost(String value) {
+        String host = value;
+        if (host.endsWith(".")) {
+            host = host.substring(0, host.length() - 1);
+        }
+        if (host.isEmpty() || host.length() > 253) {
+            return false;
+        }
+
+        if (host.matches("[0-9.]+")) {
+            return isValidIpv4Literal(host);
+        }
+
+        String[] labels = host.split("\\.", -1);
+        for (String label : labels) {
+            if (label.isEmpty() || label.length() > 63
+                || !label.matches("[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?")) {
                 return false;
             }
         }
+        return true;
+    }
 
-        if (port != null) {
-            if (port.isEmpty() || !port.chars().allMatch(Character::isDigit)) {
+    private static boolean isValidIpv4Literal(String value) {
+        String[] octets = value.split("\\.", -1);
+        if (octets.length != 4) {
+            return false;
+        }
+        for (String octet : octets) {
+            if (octet.isEmpty() || octet.length() > 3
+                || !octet.chars().allMatch(Character::isDigit)) {
                 return false;
             }
             try {
-                int number = Integer.parseInt(port);
-                return inRange(number, 1, 65535);
+                if (!inRange(Integer.parseInt(octet), 0, 255)) {
+                    return false;
+                }
             } catch (NumberFormatException exception) {
                 return false;
             }
         }
         return true;
+    }
+
+    private static boolean isValidIpv6Literal(String host) {
+        if (!host.contains(":") || !host.matches("[0-9A-Fa-f:]+")) {
+            return false;
+        }
+
+        int compression = host.indexOf("::");
+        if (compression >= 0 && compression != host.lastIndexOf("::")) {
+            return false;
+        }
+
+        String[] groups = host.split(":", -1);
+        int groupCount = 0;
+        for (String group : groups) {
+            if (group.isEmpty()) {
+                continue;
+            }
+            if (group.length() > 4 || !group.matches("[0-9A-Fa-f]+")) {
+                return false;
+            }
+            groupCount++;
+        }
+        return compression >= 0 ? groupCount < 8 : groupCount == 8;
+    }
+
+    private static boolean isValidPort(String port) {
+        if (port.isEmpty() || !port.chars().allMatch(Character::isDigit)) {
+            return false;
+        }
+        try {
+            return inRange(Integer.parseInt(port), 1, 65535);
+        } catch (NumberFormatException exception) {
+            return false;
+        }
     }
 
     private static boolean validTimedAction(TimedActionSettings action) {
