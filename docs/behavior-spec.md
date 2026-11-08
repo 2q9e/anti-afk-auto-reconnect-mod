@@ -1,6 +1,6 @@
 # Behavior specification
 
-Target platforms: Minecraft Java Edition 1.21.4 (Fabric Loader 0.20.1, Java 21), Minecraft Java Edition 1.21.11 (Fabric Loader 0.20.1, Java 21), and Minecraft Java Edition 26.3 (Fabric Loader 0.20.1, Java 25). Both version modules follow the behavior below; Minecraft-facing code and dependency pins are maintained separately per version.
+Target platforms: Minecraft Java Edition 26.1.x (compiled against 26.1.2; tested with 26.1, 26.1.1, and 26.1.2), Minecraft Java Edition 26.2, Minecraft Java Edition 26.3 (all Fabric Loader 0.20.1 and Java 25), Minecraft Java Edition 1.21.11 (Fabric Loader 0.20.1, Java 21), and Minecraft Java Edition 1.21.4 (Fabric Loader 0.20.1, Java 21). All five version modules follow the behavior below; Minecraft-facing code and dependency pins are maintained separately per version.
 
 ## Controls and settings
 

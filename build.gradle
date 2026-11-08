@@ -3,9 +3,9 @@ plugins {
 }
 
 tasks.named('build') {
-    dependsOn ':versions:26.3:build', ':versions:1.21.11:build', ':versions:1.21.4:build'
+    dependsOn ':versions:26.3:build', ':versions:26.1:build', ':versions:26.2:build', ':versions:1.21.11:build', ':versions:1.21.4:build'
 }
 
 tasks.named('clean') {
-    dependsOn ':versions:26.3:clean', ':versions:1.21.11:clean', ':versions:1.21.4:clean'
+    dependsOn ':versions:26.3:clean', ':versions:26.1:clean', ':versions:26.2:clean', ':versions:1.21.11:clean', ':versions:1.21.4:clean'
 }
