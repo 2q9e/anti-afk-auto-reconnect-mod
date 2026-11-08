@@ -50,7 +50,7 @@ public final class AntiAfkClient implements ClientModInitializer {
             String signedContent = signedMessage.signedContent();
             client.execute(() -> autoWelcomeController.onChatMessage(
                 client,
-                sender.getId(),
+                sender.id(),
                 signedContent,
                 config.autoWelcome
             ));
