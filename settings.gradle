@@ -4,6 +4,15 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
     }
+
+    plugins {
+        id 'net.fabricmc.fabric-loom' version '1.19.4'
+        id 'net.fabricmc.fabric-loom-remap' version '1.19.4'
+    }
 }
 
 rootProject.name = 'anti-afk-auto-reconnect-mod'
+include 'versions:26.3'
+include 'versions:1.21.11'
+project(':versions:26.3').projectDir = file('versions/26.3')
+project(':versions:1.21.11').projectDir = file('versions/1.21.11')
