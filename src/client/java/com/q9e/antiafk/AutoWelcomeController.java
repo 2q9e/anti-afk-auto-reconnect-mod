@@ -27,7 +27,8 @@ public final class AutoWelcomeController {
         String signedContent,
         AutoWelcomeSettings settings
     ) {
-        if (!isAvailable(client, settings) || senderId == null || signedContent == null
+        if (!isEnabledInWorld(client, settings) || client.gui.screen() != null
+            || client.gui.overlay() != null || senderId == null || signedContent == null
             || client.player.getUUID().equals(senderId)) {
             return;
         }
@@ -51,7 +52,7 @@ public final class AutoWelcomeController {
 
     public void tick(Minecraft client, AutoWelcomeSettings settings) {
         tick++;
-        if (!isAvailable(client, settings)) {
+        if (!isEnabledInWorld(client, settings)) {
             clear();
             return;
         }
@@ -63,6 +64,12 @@ public final class AutoWelcomeController {
         }
         if (sessionConnection != null && sessionConnection != connection) {
             clear();
+        }
+        if (client.gui.screen() != null || client.gui.overlay() != null) {
+            if (pending) {
+                sendAt++;
+            }
+            return;
         }
         if (!pending || tick < sendAt) {
             return;
@@ -83,10 +90,9 @@ public final class AutoWelcomeController {
         clear();
     }
 
-    private static boolean isAvailable(Minecraft client, AutoWelcomeSettings settings) {
+    private static boolean isEnabledInWorld(Minecraft client, AutoWelcomeSettings settings) {
         return settings != null && settings.enabled
-            && client.player != null && client.level != null
-            && client.gui.screen() == null && client.gui.overlay() == null;
+            && client.player != null && client.level != null;
     }
 
     private void clear() {
