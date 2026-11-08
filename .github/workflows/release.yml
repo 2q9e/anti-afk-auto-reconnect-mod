@@ -93,6 +93,9 @@ jobs:
           printf '%s\n' \
             "Anti-AFK and Auto Reconnect Mod v${MOD_VERSION} for Minecraft ${MINECRAFT_VERSION}." \
             "" \
+            "This client-side mod runs locally and requires no separate VPS or hosted service." \
+            "Reconnect connects directly to the configured Minecraft server through the normal game client." \
+            "" \
             "Install this JAR with Fabric Loader and Fabric API for Minecraft ${MINECRAFT_VERSION}." \
             "" \
             "The 26.1 release is built against Minecraft 26.1.2 and verified against 26.1, 26.1.1, and 26.1.2." \

@@ -2,6 +2,8 @@
 
 A client-side Fabric mod for timed anti-AFK actions, reconnecting to a configured Minecraft server, and replying to player chat with Auto Welcome.
 
+The mod runs locally in the Minecraft client and requires no separate VPS or hosted service. Reconnect connects directly to the player's configured Minecraft server through the normal game client.
+
 ## Supported Minecraft versions
 
 | Minecraft | Fabric API | Java bytecode target | Project |
@@ -46,6 +48,8 @@ GitHub Actions builds all five version projects on pushes to `main` and pull req
 ## GitHub Releases
 
 Each Minecraft target has its own GitHub Release with the matching JAR attached. Push a tag in the form `minecraft-<minecraft-version>-v<mod-version>`; the version must match that module's `mod_version` in `gradle.properties`. The release workflow builds and validates only the matching module before publishing the JAR.
+
+Push one release tag at a time. GitHub does not create push events when more than three tags are pushed together.
 
 The initial releases use these tags:
 
