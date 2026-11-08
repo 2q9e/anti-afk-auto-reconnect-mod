@@ -157,7 +157,7 @@ public final class ModConfig {
         }
         for (String octet : octets) {
             if (octet.isEmpty() || octet.length() > 3
-                || !octet.chars().allMatch(Character::isDigit)) {
+                || !octet.matches("[0-9]+")) {
                 return false;
             }
             try {
@@ -196,7 +196,7 @@ public final class ModConfig {
     }
 
     private static boolean isValidPort(String port) {
-        if (port.isEmpty() || !port.chars().allMatch(Character::isDigit)) {
+        if (port.isEmpty() || !port.matches("[0-9]+")) {
             return false;
         }
         try {
