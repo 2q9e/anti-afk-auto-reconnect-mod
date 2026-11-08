@@ -9,6 +9,7 @@
   ],
   "license": "MIT",
   "environment": "client",
+  "accessWidener": "anti_afk_reconnect.classtweaker",
   "entrypoints": {
     "client": [
       "com.q9e.antiafk.AntiAfkClient"
