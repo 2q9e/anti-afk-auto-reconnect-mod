@@ -10,6 +10,8 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ScrollableLayout;
 import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.components.events.ContainerEventHandler;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
@@ -159,6 +161,16 @@ public final class ReconnectSettingsScreen extends Screen {
         layout.arrangeElements();
         scrollArea.setX((width - scrollArea.getWidth()) / 2);
         scrollArea.setY(layout.getHeaderHeight());
+        restoreFocusedChild();
+    }
+
+    private void restoreFocusedChild() {
+        if (getFocused() instanceof ContainerEventHandler focusContainer) {
+            GuiEventListener focusedChild = focusContainer.getFocused();
+            if (focusedChild != null) {
+                focusContainer.setFocused(focusedChild);
+            }
+        }
     }
 
     @Override
