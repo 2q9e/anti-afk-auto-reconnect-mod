@@ -4,7 +4,9 @@ plugins {
 
 def versionProperties = new Properties()
 file('gradle.properties').withInputStream { versionProperties.load(it) }
-def versionProperty = { String name -> versionProperties.getProperty(name) }
+def versionProperty = { String name ->
+    project.findProperty(name)?.toString() ?: versionProperties.getProperty(name)
+}
 def javaVersion = versionProperty('java_version').toInteger()
 
 group = versionProperty('maven_group')
