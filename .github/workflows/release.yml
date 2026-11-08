@@ -35,23 +35,25 @@ jobs:
           set -euo pipefail
 
           case "$TAG_NAME" in
-            minecraft-1.21.4-v*) minecraft_version="1.21.4"; project_dir="1.21.4" ;;
-            minecraft-1.21.11-v*) minecraft_version="1.21.11"; project_dir="1.21.11" ;;
-            minecraft-26.1-v*) minecraft_version="26.1"; project_dir="26.1" ;;
-            minecraft-26.2-v*) minecraft_version="26.2"; project_dir="26.2" ;;
-            minecraft-26.3-v*) minecraft_version="26.3"; project_dir="26.3" ;;
+            minecraft-1.21.4-v*) minecraft_version="1.21.4"; minecraft_constraint="1.21.4"; project_dir="1.21.4" ;;
+            minecraft-1.21.11-v*) minecraft_version="1.21.11"; minecraft_constraint="~1.21.11"; project_dir="1.21.11" ;;
+            minecraft-26.1-v*) minecraft_version="26.1"; minecraft_constraint="26.1.x"; project_dir="26.1" ;;
+            minecraft-26.2-v*) minecraft_version="26.2"; minecraft_constraint="~26.2"; project_dir="26.2" ;;
+            minecraft-26.3-v*) minecraft_version="26.3"; minecraft_constraint="~26.3"; project_dir="26.3" ;;
             *) echo "Unsupported release tag: $TAG_NAME" >&2; exit 1 ;;
           esac
 
           mod_version="$(sed -n 's/^mod_version=//p' "versions/$project_dir/gradle.properties" | head -n 1)"
+          archive_base_name="$(sed -n 's/^archives_base_name=//p' "versions/$project_dir/gradle.properties" | head -n 1)"
           expected_tag="minecraft-${minecraft_version}-v${mod_version}"
           if [[ "$TAG_NAME" != "$expected_tag" ]]; then
             echo "Tag '$TAG_NAME' does not match the module version '$expected_tag'." >&2
             exit 1
           fi
 
-          jar_path="versions/$project_dir/build/libs/anti-afk-auto-reconnect-mod-${project_dir}-${mod_version}.jar"
+          jar_path="versions/$project_dir/build/libs/${archive_base_name}-${mod_version}.jar"
           echo "minecraft_version=$minecraft_version" >> "$GITHUB_OUTPUT"
+          echo "minecraft_constraint=$minecraft_constraint" >> "$GITHUB_OUTPUT"
           echo "project_dir=$project_dir" >> "$GITHUB_OUTPUT"
           echo "mod_version=$mod_version" >> "$GITHUB_OUTPUT"
           echo "jar_path=$jar_path" >> "$GITHUB_OUTPUT"
@@ -65,13 +67,15 @@ jobs:
         shell: bash
         env:
           JAR_PATH: ${{ steps.target.outputs.jar_path }}
+          MINECRAFT_CONSTRAINT: ${{ steps.target.outputs.minecraft_constraint }}
           MOD_VERSION: ${{ steps.target.outputs.mod_version }}
         run: |
           set -euo pipefail
           test -f "$JAR_PATH"
           unzip -p "$JAR_PATH" fabric.mod.json | jq -e \
             --arg mod_version "$MOD_VERSION" \
-            '.id == "anti_afk_reconnect" and .version == $mod_version and .environment == "client" and (.entrypoints.client | index("com.q9e.antiafk.AntiAfkClient") != null)' \
+            --arg minecraft_constraint "$MINECRAFT_CONSTRAINT" \
+            '.id == "anti_afk_reconnect" and .version == $mod_version and .depends.minecraft == $minecraft_constraint and .environment == "client" and (.entrypoints.client | index("com.q9e.antiafk.AntiAfkClient") != null)' \
             > /dev/null
 
       - name: Publish GitHub Release
