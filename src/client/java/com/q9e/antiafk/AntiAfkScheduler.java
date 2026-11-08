@@ -112,7 +112,7 @@ public final class AntiAfkScheduler {
         if (input.hold(attack)) {
             // Vanilla resolves the current crosshair target and block occlusion
             // through its regular attack handling after this key mapping is queued.
-            KeyMapping.click(attack.getKey());
+            input.queueClick(attack);
             hitReleaseAt = tick + secondsToTicks(HIT_HOLD_SECONDS);
         }
         nextHitAt = tick + secondsToTicks(settings.hit.intervalSeconds);
