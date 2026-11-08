@@ -1,0 +1,62 @@
+plugins {
+    id 'net.fabricmc.fabric-loom-remap'
+}
+
+def versionProperties = new Properties()
+file('gradle.properties').withInputStream { versionProperties.load(it) }
+def versionProperty = { String name -> versionProperties.getProperty(name) }
+def javaVersion = versionProperty('java_version').toInteger()
+
+group = versionProperty('maven_group')
+version = versionProperty('mod_version')
+
+base {
+    archivesName = versionProperty('archives_base_name')
+}
+
+repositories {
+    maven { url = 'https://maven.fabricmc.net/' }
+    mavenCentral()
+}
+
+loom {
+    splitEnvironmentSourceSets()
+
+    mods {
+        'anti_afk_reconnect' {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.client
+        }
+    }
+}
+
+sourceSets.main.java.srcDir(rootProject.file('shared/src/main/java'))
+
+dependencies {
+    minecraft "com.mojang:minecraft:${versionProperty('minecraft_version')}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${versionProperty('loader_version')}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${versionProperty('fabric_api_version')}"
+}
+
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') {
+        expand 'version': project.version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = javaVersion
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(javaVersion)
+    withSourcesJar()
+}
+
+jar {
+    from(rootProject.file('LICENSE')) {
+        rename { "${it}_${project.name}" }
+    }
+}
