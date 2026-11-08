@@ -20,14 +20,6 @@ public final class AutomationInput {
         return true;
     }
 
-    public boolean queueClick(KeyMapping mapping) {
-        if (mapping.isUnbound()) {
-            return false;
-        }
-        KeyMapping.click(InputConstants.getKey(mapping.saveString()));
-        return true;
-    }
-
     public boolean hold(KeyMapping mapping) {
         if (mapping.isDown() || mapping.isUnbound()) {
             return false;
