@@ -43,9 +43,9 @@ public final class AutomationInput {
         }
     }
 
-    public void releaseAll() {
+    public void releaseAll(boolean preservePhysicalInput) {
         for (KeyMapping mapping : heldMappings) {
-            mapping.setDown(isPhysicalInputDown(mapping));
+            mapping.setDown(preservePhysicalInput && isPhysicalInputDown(mapping));
         }
         heldMappings.clear();
     }
