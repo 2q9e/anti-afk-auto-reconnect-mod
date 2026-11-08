@@ -31,11 +31,18 @@ public final class ScrollableForm extends AbstractContainerWidget {
         refreshFormLayout();
         refreshScrollAmount();
         positionWidgets();
+        scrollFocusedChildIntoView(getFocused());
     }
 
     @Override
     public List<? extends GuiEventListener> children() {
         return widgets;
+    }
+
+    @Override
+    public void setFocused(GuiEventListener child) {
+        super.setFocused(child);
+        scrollFocusedChildIntoView(child);
     }
 
     @Override
@@ -114,5 +121,21 @@ public final class ScrollableForm extends AbstractContainerWidget {
             widget.setX(formX + baseX.get(i));
             widget.setY(formY + baseY.get(i));
         }
+    }
+
+    private void scrollFocusedChildIntoView(GuiEventListener child) {
+        if (!(child instanceof AbstractWidget widget)) {
+            return;
+        }
+
+        double nextScrollAmount = scrollAmount();
+        if (widget.getY() < getY()) {
+            nextScrollAmount -= getY() - widget.getY();
+        } else if (widget.getBottom() > getBottom()) {
+            nextScrollAmount += widget.getBottom() - getBottom();
+        }
+
+        setScrollAmount(nextScrollAmount);
+        positionWidgets();
     }
 }
