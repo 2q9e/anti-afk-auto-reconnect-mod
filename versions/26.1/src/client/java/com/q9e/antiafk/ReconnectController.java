@@ -44,6 +44,12 @@ public final class ReconnectController {
     private long disconnectCheckDeadline;
     private int retriesScheduled;
     private boolean automaticAttempt;
+    private boolean modInitiatedDisconnect;
+
+    public void markModInitiatedDisconnect() {
+        modInitiatedDisconnect = true;
+        postReconnectMessages.clear();
+    }
 
     public void onPlayDisconnect(Minecraft client, ReconnectSettings settings) {
         if (modInitiatedDisconnect) {
