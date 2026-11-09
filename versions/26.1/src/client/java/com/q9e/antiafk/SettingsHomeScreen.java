@@ -35,7 +35,15 @@ public final class SettingsHomeScreen extends Screen {
 
         addRenderableWidget(Button.builder(Component.literal("Auto Welcome settings"), button ->
             minecraft.setScreen(new AutoWelcomeSettingsScreen(this, draft))
-        ).bounds(left, height / 2 - 16, buttonWidth, 24).build());
+        ).bounds(left, settingsTop + 58, buttonWidth, 24).build());
+
+        addRenderableWidget(Button.builder(Component.literal("Auto Respawn settings"), button ->
+            minecraft.setScreen(new AutoRespawnSettingsScreen(this, draft))
+        ).bounds(left, settingsTop + 87, buttonWidth, 24).build());
+
+        addRenderableWidget(Button.builder(Component.literal("Auto Logout settings"), button ->
+            minecraft.setScreen(new AutoLogoutSettingsScreen(this, draft))
+        ).bounds(left, settingsTop + 116, buttonWidth, 24).build());
 
         addRenderableWidget(Button.builder(Component.literal("Save"), button -> save())
             .bounds(left, settingsTop + 145, 105, 24).build());
