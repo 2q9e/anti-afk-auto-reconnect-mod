@@ -22,3 +22,27 @@ public final class AutoLogoutSettingsScreen extends Screen {
     private LinearLayout form;
     private EditBox range;
     private EditBox ignoredUsernames;
+    private boolean enabled;
+    private String status = "";
+
+    public AutoLogoutSettingsScreen(Screen parent, ModConfig draft) {
+        super(Component.literal("Auto Logout settings"));
+        this.parent = parent;
+        this.draft = draft;
+    }
+
+    @Override
+    protected void init() {
+        AutoLogoutSettings settings = draft.autoLogout;
+        int buttonWidth = Math.max(110, Math.min(240, width - 64));
+        enabled = settings.enabled;
+
+        layout = new HeaderAndFooterLayout(this, 32, 42);
+        layout.addTitleHeader(title, font);
+        form = LinearLayout.vertical().spacing(6);
+        form.defaultCellSetting().alignHorizontallyLeft();
+
+        addToggle("Auto Logout", buttonWidth, () -> enabled, value -> enabled = value);
+        addLabel("Disconnect when another player is nearby.");
+        addLabel("Detection radius in blocks (1–15)");
+        range = new EditBox(font, 0, 0, 110, 20, Component.literal("Auto Logout range"));
