@@ -11,7 +11,7 @@ Target platforms: Minecraft Java Edition 26.1.x (compiled against 26.1.2; tested
 ## Reconnect
 
 - Store one configured server address, a first retry delay, and a subsequent retry delay.
-- Start retry scheduling after a play disconnect produces the vanilla disconnect screen; a return to the title screen cancels the retry flow.
+- After a play disconnect, stop if Auto Logout marked it as mod-initiated. Otherwise, start retry scheduling only when the vanilla disconnect screen appears; a return to the title screen cancels the retry flow.
 - Wait the first delay before the first retry, then use the subsequent delay for later failed retries.
 - Schedule no more than one retry or connection attempt at a time.
 - After an automatic reconnect succeeds, send up to five configured, nonblank chat lines or commands once, in their listed order.
