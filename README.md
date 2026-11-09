@@ -22,11 +22,15 @@ Each version is an independent Gradle project with its own dependencies, mod met
 - Enable Jump, Hit, Crouch, and Move independently. Each action has its own timer and can overlap with the others.
 - Set an initial anti-AFK delay before the first action.
 - Jump holds its normal key mapping for one client input tick.
-- Hit holds the normal attack key for one second. Minecraft applies its current crosshair target and block occlusion through its ordinary attack handling.
+- Hit calls Minecraft's normal attack routine once per configured interval without holding the attack key. Minecraft applies its current crosshair target and block occlusion through its ordinary attack handling.
 - Crouch and Move each have an interval and a hold duration. A duration cannot exceed its interval.
 - Edit the movement sequence. The default is `FORWARD, LEFT, RIGHT, LEFT`.
 - Reconnect to a configured address after an unexpected disconnect, with separate first and later retry delays.
 - After an automatic reconnect succeeds, send up to five configured chat messages or slash commands in order, one second apart.
+- Auto Welcome matches the substring `welcome` in player chat and system messages, including command feedback, without regard to letter case or word boundaries. It ignores your own player messages, waits the configured delay before replying `welcome`, then waits the same delay before accepting another match.
+- Auto Respawn sends one normal respawn request after the configured delay whenever the death screen appears.
+- Auto Logout disconnects when another player is within a configurable 1–15 block radius. Ignore up to ten comma-separated usernames; matching is case-insensitive.
+- Auto Logout disconnects are marked as mod-initiated, so Auto Reconnect stops for that disconnect.
 
 Settings are stored locally in `config/anti-afk-auto-reconnect.json`. All features are disabled by default; Auto Respawn starts with a five-second delay and Auto Logout starts with a ten-block radius.
 
