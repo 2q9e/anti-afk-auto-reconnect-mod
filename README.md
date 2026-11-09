@@ -27,9 +27,8 @@ Each version is an independent Gradle project with its own dependencies, mod met
 - Edit the movement sequence. The default is `FORWARD, LEFT, RIGHT, LEFT`.
 - Reconnect to a configured address after an unexpected disconnect, with separate first and later retry delays.
 - After an automatic reconnect succeeds, send up to five configured chat messages or slash commands in order, one second apart.
-- Auto Welcome matches the substring `welcome` in player chat without regard to letter case or word boundaries. It ignores system messages and your own messages, waits the configured delay before replying `welcome`, then waits the same delay before accepting another match.
 
-Settings are stored locally in `config/anti-afk-auto-reconnect.json`. All features are disabled by default.
+Settings are stored locally in `config/anti-afk-auto-reconnect.json`. All features are disabled by default; Auto Respawn starts with a five-second delay and Auto Logout starts with a ten-block radius.
 
 ## Build
 
