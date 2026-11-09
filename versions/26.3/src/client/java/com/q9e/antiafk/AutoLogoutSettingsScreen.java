@@ -46,3 +46,27 @@ public final class AutoLogoutSettingsScreen extends Screen {
         addLabel("Disconnect when another player is nearby.");
         addLabel("Detection radius in blocks (1–15)");
         range = new EditBox(font, 0, 0, 110, 20, Component.literal("Auto Logout range"));
+        range.setMaxLength(2);
+        range.setValue(Integer.toString(settings.detectionRangeBlocks));
+        form.addChild(range);
+        addLabel("Ignore usernames (comma-separated, up to 10)");
+        ignoredUsernames = new EditBox(font, 0, 0, Math.max(120, Math.min(360, width - 64)), 20,
+            Component.literal("Ignored usernames"));
+        ignoredUsernames.setMaxLength(190);
+        ignoredUsernames.setValue(settings.ignoredUsernames == null
+            ? ""
+            : String.join(", ", settings.ignoredUsernames));
+        form.addChild(ignoredUsernames);
+
+        scrollArea = new ScrollableLayout(minecraft, form, layout.getContentHeight());
+        scrollArea.setMinWidth(Math.min(width - 32, 360));
+        layout.addToContents(scrollArea);
+
+        LinearLayout footer = LinearLayout.horizontal().spacing(8);
+        footer.addChild(Button.builder(Component.literal("Apply"), button -> apply())
+            .bounds(0, 0, 92, 24).build());
+        footer.addChild(Button.builder(Component.literal("Cancel"), button -> minecraft.gui.setScreen(parent))
+            .bounds(0, 0, 92, 24).build());
+        layout.addToFooter(footer);
+
+        repositionElements();
