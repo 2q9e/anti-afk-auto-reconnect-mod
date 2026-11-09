@@ -46,3 +46,27 @@ public final class AutoRespawnSettingsScreen extends Screen {
         addLabel("Respawn delay (seconds)");
         delay = new EditBox(font, 0, 0, 110, 20, Component.literal("Auto Respawn delay"));
         delay.setMaxLength(8);
+        delay.setValue(Integer.toString(settings.delaySeconds));
+        form.addChild(delay);
+
+        scrollArea = new ScrollableLayout(minecraft, form, layout.getContentHeight());
+        scrollArea.setMinWidth(Math.min(width - 32, 360));
+        layout.addToContents(scrollArea);
+
+        LinearLayout footer = LinearLayout.horizontal().spacing(8);
+        footer.addChild(Button.builder(Component.literal("Apply"), button -> apply())
+            .bounds(0, 0, 92, 24).build());
+        footer.addChild(Button.builder(Component.literal("Cancel"), button -> minecraft.gui.setScreen(parent))
+            .bounds(0, 0, 92, 24).build());
+        layout.addToFooter(footer);
+
+        repositionElements();
+        layout.visitWidgets(this::addRenderableWidget);
+    }
+
+    private void addLabel(String text) {
+        StringWidget label = new StringWidget(Component.literal(text), font)
+            .setMaxWidth(Math.max(120, width - 48));
+        form.addChild(label);
+    }
+
