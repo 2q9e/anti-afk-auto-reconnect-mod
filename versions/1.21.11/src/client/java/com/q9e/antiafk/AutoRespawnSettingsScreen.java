@@ -118,3 +118,22 @@ public final class AutoRespawnSettingsScreen extends Screen {
         scrollArea.setX((width - scrollArea.getWidth()) / 2);
         scrollArea.setY(layout.getHeaderHeight());
     }
+
+    @Override
+    public void render(
+        GuiGraphics graphics,
+        int mouseX,
+        int mouseY,
+        float delta
+    ) {
+        super.render(graphics, mouseX, mouseY, delta);
+        if (!status.isEmpty()) {
+            graphics.drawString(font, status, 12, height - 56, 0xFFFF5555, true);
+        }
+    }
+
+    @Override
+    public void onClose() {
+        minecraft.setScreen(parent);
+    }
+}
