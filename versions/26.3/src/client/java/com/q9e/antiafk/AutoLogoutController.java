@@ -46,3 +46,25 @@ public final class AutoLogoutController {
             disconnecting = true;
             reconnectController.markModInitiatedDisconnect();
             client.disconnect();
+            return;
+        }
+    }
+
+    public void onSettingsChanged() {
+        reset();
+    }
+
+    private static boolean isIgnored(String username, List<String> ignoredUsernames) {
+        if (ignoredUsernames == null) {
+            return false;
+        }
+        return ignoredUsernames.stream()
+            .filter(name -> name != null)
+            .anyMatch(name -> name.equalsIgnoreCase(username));
+    }
+
+    private void reset() {
+        activeConnection = null;
+        disconnecting = false;
+    }
+}
