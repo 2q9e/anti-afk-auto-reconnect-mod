@@ -6,7 +6,6 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 
 public final class AntiAfkScheduler {
-    public static final int HIT_HOLD_SECONDS = 1;
     private static final int TICKS_PER_SECOND = 20;
 
     private final AutomationInput input = new AutomationInput();
@@ -15,7 +14,6 @@ public final class AntiAfkScheduler {
     private long nextJumpAt;
     private long jumpReleaseAt;
     private long nextHitAt;
-    private long hitReleaseAt;
     private long nextCrouchAt;
     private long crouchReleaseAt;
     private long nextMoveAt;
@@ -46,7 +44,6 @@ public final class AntiAfkScheduler {
         nextJumpAt = 0;
         jumpReleaseAt = 0;
         nextHitAt = 0;
-        hitReleaseAt = 0;
         nextCrouchAt = 0;
         crouchReleaseAt = 0;
         nextMoveAt = 0;
