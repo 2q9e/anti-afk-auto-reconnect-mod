@@ -118,3 +118,27 @@ public final class AutoLogoutSettingsScreen extends Screen {
     private static Component toggleMessage(String label, boolean enabled) {
         return Component.literal(label + ": " + (enabled ? "ON" : "OFF"));
     }
+
+    @Override
+    protected void repositionElements() {
+        if (layout == null || scrollArea == null) {
+            return;
+        }
+        form.arrangeElements();
+        scrollArea.arrangeElements();
+        scrollArea.setMaxHeight(layout.getContentHeight());
+        
+        layout.arrangeElements();
+        scrollArea.setX((width - scrollArea.getWidth()) / 2);
+        scrollArea.setY(layout.getHeaderHeight());
+    }
+
+    @Override
+    public void render(
+        GuiGraphics graphics,
+        int mouseX,
+        int mouseY,
+        float delta
+    ) {
+        super.render(graphics, mouseX, mouseY, delta);
+        if (!status.isEmpty()) {
