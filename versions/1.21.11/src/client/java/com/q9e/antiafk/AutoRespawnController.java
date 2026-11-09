@@ -22,3 +22,27 @@ public final class AutoRespawnController {
         if (activeLevel != client.level) {
             respawnAt = -1;
             respawnRequested = false;
+            activeLevel = client.level;
+        }
+        if (!(client.screen instanceof DeathScreen) || client.player.isAlive()) {
+            respawnAt = -1;
+            respawnRequested = false;
+            return;
+        }
+        if (respawnRequested) {
+            return;
+        }
+        if (respawnAt < 0) {
+            respawnAt = tick + secondsToTicks(settings.delaySeconds);
+        }
+        if (tick >= respawnAt) {
+            client.player.respawn();
+            respawnRequested = true;
+        }
+    }
+
+    public void onSettingsChanged() {
+        respawnAt = -1;
+        respawnRequested = false;
+    }
+
