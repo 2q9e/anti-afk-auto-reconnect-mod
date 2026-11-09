@@ -19,6 +19,8 @@ public final class AntiAfkClient implements ClientModInitializer {
     private final ClientChatSendGate chatSendGate = new ClientChatSendGate();
     private final ReconnectController reconnectController = new ReconnectController(chatSendGate);
     private final AutoWelcomeController autoWelcomeController = new AutoWelcomeController(chatSendGate);
+    private final AutoRespawnController autoRespawnController = new AutoRespawnController();
+    private final AutoLogoutController autoLogoutController = new AutoLogoutController(reconnectController);
     private ModConfig config;
     private KeyMapping openSettingsKey;
 
@@ -49,6 +51,19 @@ public final class AntiAfkClient implements ClientModInitializer {
                 client,
                 sender.getId(),
                 signedContent,
+                config.autoWelcome
+            ));
+        });
+        ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
+            if (message == null) {
+                return;
+            }
+            Minecraft client = Minecraft.getInstance();
+            String messageContent = message.getString();
+            client.execute(() -> autoWelcomeController.onChatMessage(
+                client,
+                null,
+                messageContent,
                 config.autoWelcome
             ));
         });
