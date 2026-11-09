@@ -46,3 +46,13 @@ public final class AutoRespawnController {
         respawnRequested = false;
     }
 
+    private void reset() {
+        respawnAt = -1;
+        activeLevel = null;
+        respawnRequested = false;
+    }
+
+    private static long secondsToTicks(int seconds) {
+        return Math.max(0L, (long) seconds) * TICKS_PER_SECOND;
+    }
+}
