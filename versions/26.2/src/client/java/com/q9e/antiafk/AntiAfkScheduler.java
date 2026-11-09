@@ -131,18 +131,10 @@ public final class AntiAfkScheduler {
             return;
         }
 
-        if (input.hold(attack)) {
-            // Invoke Minecraft's regular attack routine so its current hit result,
-            // item checks, block occlusion, and packet path remain authoritative.
-            client.startAttack();
-            hitReleaseAt = tick + secondsToTicks(HIT_HOLD_SECONDS);
-        }
-        // Keep one released client tick between holds so a one-second interval
-        // cannot silently turn the one-second action into a continuous hold.
-        nextHitAt = tick + Math.max(
-            secondsToTicks(settings.hit.intervalSeconds),
-            secondsToTicks(HIT_HOLD_SECONDS) + 1L
-        );
+        // Send one normal vanilla attack attempt. Holding the attack mapping
+        // would let vanilla repeat attacks on every client tick.
+        client.startAttack();
+        nextHitAt = tick + secondsToTicks(settings.hit.intervalSeconds);
     }
 
     private void scheduleCrouch(Minecraft client, AntiAfkSettings settings) {
