@@ -70,3 +70,27 @@ public final class AutoLogoutSettingsScreen extends Screen {
 
         repositionElements();
         layout.visitWidgets(this::addRenderableWidget);
+    }
+
+    private void addLabel(String text) {
+        MultiLineTextWidget label = new MultiLineTextWidget(Component.literal(text), font)
+            .setMaxWidth(Math.max(120, width - 48));
+        form.addChild(label);
+    }
+
+    private void addToggle(String label, int buttonWidth, BooleanSupplier read, Consumer<Boolean> write) {
+        Button button = Button.builder(toggleMessage(label, read.getAsBoolean()), widget -> {
+            boolean nextValue = !read.getAsBoolean();
+            write.accept(nextValue);
+            widget.setMessage(toggleMessage(label, nextValue));
+        }).bounds(0, 0, buttonWidth, 22).build();
+        form.addChild(button);
+    }
+
+    private void apply() {
+        AutoLogoutSettings updated = new AutoLogoutSettings();
+        updated.enabled = enabled;
+        try {
+            updated.detectionRangeBlocks = Integer.parseInt(range.getValue().trim());
+        } catch (NumberFormatException exception) {
+            status = "Enter a whole number for the Auto Logout range.";
