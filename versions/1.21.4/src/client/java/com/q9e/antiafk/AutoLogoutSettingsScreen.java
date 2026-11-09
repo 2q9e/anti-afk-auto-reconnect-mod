@@ -118,3 +118,27 @@ public final class AutoLogoutSettingsScreen extends Screen {
         return Component.literal(label + ": " + (enabled ? "ON" : "OFF"));
     }
 
+    @Override
+    protected void repositionElements() {
+        if (layout == null || scrollArea == null) {
+            return;
+        }
+        form.arrangeElements();
+        layout.arrangeElements();
+        int scrollWidth = Math.max(120, Math.min(400, width - 32));
+        scrollArea.setBounds(
+            (width - scrollWidth) / 2,
+            layout.getHeaderHeight(),
+            scrollWidth,
+            layout.getContentHeight()
+        );
+    }
+
+    @Override
+    public void render(
+        GuiGraphics graphics,
+        int mouseX,
+        int mouseY,
+        float delta
+    ) {
+        super.render(graphics, mouseX, mouseY, delta);
