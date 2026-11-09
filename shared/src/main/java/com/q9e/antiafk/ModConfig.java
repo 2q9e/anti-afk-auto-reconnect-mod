@@ -28,8 +28,22 @@ public final class ModConfig {
         if (schemaVersion != 1) {
             return "Unsupported configuration version.";
         }
-        if (reconnect == null || antiAfk == null || autoWelcome == null) {
-            return "Reconnect, anti-AFK, and auto-welcome settings are required.";
+        if (reconnect == null || antiAfk == null || autoWelcome == null
+            || autoRespawn == null || autoLogout == null) {
+            return "Reconnect, anti-AFK, auto-welcome, auto-respawn, and auto-logout settings are required.";
+        }
+        if (!inRange(autoRespawn.delaySeconds, 0, 3600)) {
+            return "Auto Respawn delay must be between 0 and 3600 seconds.";
+        }
+        if (!inRange(autoLogout.detectionRangeBlocks, 1, 15)) {
+            return "Auto Logout detection range must be between 1 and 15 blocks.";
+        }
+        if (autoLogout.ignoredUsernames == null || autoLogout.ignoredUsernames.size() > 10) {
+            return "Auto Logout can ignore no more than ten usernames.";
+        }
+        Set<String> ignoredUsernames = new HashSet<>();
+        for (String username : autoLogout.ignoredUsernames) {
+            if (username == null || !username.matches("[A-Za-z0-9_]{3,16}")) {
         }
         if (!inRange(autoWelcome.delaySeconds, 1, 3600)) {
             return "Auto Welcome delay must be between 1 and 3600 seconds.";
