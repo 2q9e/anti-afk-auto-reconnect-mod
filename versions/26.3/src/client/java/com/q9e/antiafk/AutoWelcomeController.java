@@ -24,10 +24,12 @@ public final class AutoWelcomeController {
     public void onChatMessage(
         Minecraft client,
         UUID senderId,
-        String signedContent,
+        String messageContent,
         AutoWelcomeSettings settings
     ) {
         if (!isEnabledInWorld(client, settings) || client.gui.screen() != null
+            || client.gui.overlay() != null || messageContent == null
+            || (senderId != null && client.player.getUUID().equals(senderId))) {
             return;
         }
 
