@@ -5,6 +5,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -16,6 +18,8 @@ public final class ModConfig {
     public ReconnectSettings reconnect = new ReconnectSettings();
     public AntiAfkSettings antiAfk = new AntiAfkSettings();
     public AutoWelcomeSettings autoWelcome = new AutoWelcomeSettings();
+    public AutoRespawnSettings autoRespawn = new AutoRespawnSettings();
+    public AutoLogoutSettings autoLogout = new AutoLogoutSettings();
     public List<String> afterReconnectMessages = new ArrayList<>(
         Collections.nCopies(5, "")
     );
@@ -44,6 +48,11 @@ public final class ModConfig {
         Set<String> ignoredUsernames = new HashSet<>();
         for (String username : autoLogout.ignoredUsernames) {
             if (username == null || !username.matches("[A-Za-z0-9_]{3,16}")) {
+                return "Ignored usernames must contain 3 to 16 letters, numbers, or underscores.";
+            }
+            if (!ignoredUsernames.add(username.toLowerCase(Locale.ROOT))) {
+                return "Each Auto Logout username can only be listed once.";
+            }
         }
         if (!inRange(autoWelcome.delaySeconds, 1, 3600)) {
             return "Auto Welcome delay must be between 1 and 3600 seconds.";
