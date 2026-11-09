@@ -41,7 +41,6 @@ public final class SettingsHomeScreen extends Screen {
             .bounds(left, height / 2 + 24, 105, 24).build());
         addRenderableWidget(Button.builder(Component.literal("Cancel"), button ->
             minecraft.setScreen(parent)
-        ).bounds(left + 115, height / 2 + 24, 105, 24).build());
     }
 
     private void save() {
@@ -63,7 +62,7 @@ public final class SettingsHomeScreen extends Screen {
         super.extractRenderState(graphics, mouseX, mouseY, delta);
         graphics.text(font, "Open this screen with the configurable key in Options > Controls.", 18, 24, 0xFFFFFFFF, true);
         if (!status.isEmpty()) {
-            graphics.text(font, status, 18, height - 32, 0xFFFF5555, true);
+            graphics.text(font, status, 18, height - 10, 0xFFFF5555, true);
         }
     }
 
