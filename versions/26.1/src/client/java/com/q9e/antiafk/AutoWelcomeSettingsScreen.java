@@ -42,7 +42,7 @@ public final class AutoWelcomeSettingsScreen extends Screen {
         form.defaultCellSetting().alignHorizontallyLeft();
 
         addToggle("Auto Welcome", buttonWidth, () -> enabled, value -> enabled = value);
-        addLabel("Match player chat containing welcome, ignoring letter case.");
+        addLabel("Match chat, system messages, and command feedback containing welcome, ignoring case.");
         addLabel("Reply with welcome after the delay, then wait the same delay before accepting another match.");
         addLabel("Reply delay and scan cooldown (seconds)");
         delay = new EditBox(font, 0, 0, 110, 20, Component.literal("Auto Welcome delay"));
