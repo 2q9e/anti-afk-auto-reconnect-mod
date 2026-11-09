@@ -38,9 +38,10 @@ public final class SettingsHomeScreen extends Screen {
         ).bounds(left, height / 2 - 16, buttonWidth, 24).build());
 
         addRenderableWidget(Button.builder(Component.literal("Save"), button -> save())
-            .bounds(left, height / 2 + 24, 105, 24).build());
+            .bounds(left, settingsTop + 145, 105, 24).build());
         addRenderableWidget(Button.builder(Component.literal("Cancel"), button ->
             minecraft.setScreen(parent)
+        ).bounds(left + 115, settingsTop + 145, 105, 24).build());
     }
 
     private void save() {
