@@ -101,6 +101,12 @@ public final class AntiAfkClient implements ClientModInitializer {
         if (autoWelcomeChanged) {
             autoWelcomeController.onSettingsChanged();
         }
+        if (autoRespawnChanged) {
+            autoRespawnController.onSettingsChanged();
+        }
+        if (autoLogoutChanged) {
+            autoLogoutController.onSettingsChanged();
+        }
         return null;
     }
 
@@ -127,6 +133,16 @@ public final class AntiAfkClient implements ClientModInitializer {
 
     private static boolean sameAutoWelcome(AutoWelcomeSettings left, AutoWelcomeSettings right) {
         return left.enabled == right.enabled && left.delaySeconds == right.delaySeconds;
+    }
+
+    private static boolean sameAutoRespawn(AutoRespawnSettings left, AutoRespawnSettings right) {
+        return left.enabled == right.enabled && left.delaySeconds == right.delaySeconds;
+    }
+
+    private static boolean sameAutoLogout(AutoLogoutSettings left, AutoLogoutSettings right) {
+        return left.enabled == right.enabled
+            && left.detectionRangeBlocks == right.detectionRangeBlocks
+            && Objects.equals(left.ignoredUsernames, right.ignoredUsernames);
     }
 
     private static boolean sameReconnect(ReconnectSettings left, ReconnectSettings right) {
