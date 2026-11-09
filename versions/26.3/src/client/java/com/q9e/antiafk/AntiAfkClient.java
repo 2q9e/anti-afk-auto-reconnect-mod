@@ -67,8 +67,10 @@ public final class AntiAfkClient implements ClientModInitializer {
             }
         }
 
+        autoLogoutController.tick(client, config.autoLogout);
         reconnectController.tick(client, config.reconnect);
         autoWelcomeController.tick(client, config.autoWelcome);
+        autoRespawnController.tick(client, config.autoRespawn);
         scheduler.tick(client, config.antiAfk);
     }
 
@@ -84,6 +86,8 @@ public final class AntiAfkClient implements ClientModInitializer {
         boolean antiAfkChanged = !sameAntiAfk(config.antiAfk, updated.antiAfk);
         boolean reconnectChanged = !sameReconnect(config.reconnect, updated.reconnect);
         boolean autoWelcomeChanged = !sameAutoWelcome(config.autoWelcome, updated.autoWelcome);
+        boolean autoRespawnChanged = !sameAutoRespawn(config.autoRespawn, updated.autoRespawn);
+        boolean autoLogoutChanged = !sameAutoLogout(config.autoLogout, updated.autoLogout);
 
         try {
             ConfigStore.save(updated);
