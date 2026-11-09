@@ -88,7 +88,6 @@ public final class AntiAfkScheduler {
         nextHitAt = startAt;
         nextCrouchAt = startAt;
         nextMoveAt = startAt;
-        hitReleaseAt = 0;
         crouchReleaseAt = 0;
         moveReleaseAt = 0;
         activeMoveDirection = null;
@@ -100,10 +99,6 @@ public final class AntiAfkScheduler {
         if (jumpReleaseAt > 0 && tick >= jumpReleaseAt) {
             input.release(client.options.keyJump);
             jumpReleaseAt = 0;
-        }
-        if (hitReleaseAt > 0 && tick >= hitReleaseAt) {
-            input.release(client.options.keyAttack);
-            hitReleaseAt = 0;
         }
         if (crouchReleaseAt > 0 && tick >= crouchReleaseAt) {
             input.release(client.options.keyShift);
@@ -126,7 +121,6 @@ public final class AntiAfkScheduler {
     }
 
     private void scheduleHit(Minecraft client, AntiAfkSettings settings) {
-        KeyMapping attack = client.options.keyAttack;
         if (!settings.hit.enabled || tick < nextHitAt) {
             return;
         }
