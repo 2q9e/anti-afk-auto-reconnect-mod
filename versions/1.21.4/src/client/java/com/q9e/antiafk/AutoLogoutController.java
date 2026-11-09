@@ -22,3 +22,27 @@ public final class AutoLogoutController {
             return;
         }
 
+        ClientPacketListener connection = client.getConnection();
+        if (connection == null) {
+            reset();
+            return;
+        }
+        if (activeConnection != connection) {
+            activeConnection = connection;
+            disconnecting = false;
+        }
+        if (disconnecting) {
+            return;
+        }
+
+        double rangeSquared = (double) settings.detectionRangeBlocks * settings.detectionRangeBlocks;
+        for (Player otherPlayer : client.level.players()) {
+            if (otherPlayer == client.player
+                || otherPlayer.distanceToSqr(client.player) > rangeSquared
+                || isIgnored(otherPlayer.getName().getString(), settings.ignoredUsernames)) {
+                continue;
+            }
+
+            disconnecting = true;
+            reconnectController.markModInitiatedDisconnect();
+            client.disconnect();
