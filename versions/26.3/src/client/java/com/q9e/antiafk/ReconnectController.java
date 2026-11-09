@@ -46,6 +46,10 @@ public final class ReconnectController {
     private boolean automaticAttempt;
 
     public void onPlayDisconnect(Minecraft client, ReconnectSettings settings) {
+        if (modInitiatedDisconnect) {
+            clear();
+            return;
+        }
         if (state != State.PLAYING) {
             return;
         }
@@ -63,6 +67,7 @@ public final class ReconnectController {
     }
 
     public void onPlayJoin(Minecraft client, ClientPacketListener listener, ModConfig config) {
+        modInitiatedDisconnect = false;
         ServerData currentServer = client.getCurrentServer();
         boolean reconnectedAutomatically = automaticAttempt
             && attemptedServer != null
@@ -235,6 +240,7 @@ public final class ReconnectController {
         disconnectCheckDeadline = 0;
         retriesScheduled = 0;
         automaticAttempt = false;
+        modInitiatedDisconnect = false;
     }
 
     private static long secondsToTicks(int seconds) {
