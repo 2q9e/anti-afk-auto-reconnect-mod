@@ -20,8 +20,8 @@ Target platforms: Minecraft Java Edition 26.1.x (compiled against 26.1.2; tested
 ## Auto Welcome
 
 - Auto Welcome is disabled by default and has a configurable delay from 1 to 3600 seconds.
-- Inspect player-sent signed chat text only. Match the substring `welcome` case-insensitively, even when it appears inside a longer string.
-- Ignore system messages and messages sent by the local player.
+- Inspect signed player chat and general game messages, including server system messages and command feedback. Match the substring `welcome` case-insensitively, even when it appears inside a longer string.
+- Ignore player messages sent by the local player.
 - For the first accepted match, wait the configured delay, then send exactly `welcome` through the normal client chat path.
 - Ignore matches while a reply is pending. After sending a reply, wait the same delay before accepting another match; do not queue matches during that interval.
 - Ignore chat received while a screen or overlay is open. If one opens after a match is accepted, pause the pending reply delay until gameplay resumes; the post-reply cooldown continues to count client ticks.
@@ -34,6 +34,11 @@ Target platforms: Minecraft Java Edition 26.1.x (compiled against 26.1.2; tested
 - Reset the timer after respawning, leaving the world, or disabling Auto Respawn so every death receives its own delay.
 
 ## Auto Logout
+
+- Auto Logout is disabled by default and has a configurable detection radius from 1 to 15 blocks.
+- Watch loaded client-side players around the local player. If a non-ignored player enters the radius, disconnect through the normal client flow once.
+- Allow up to ten ignored usernames. Match them case-insensitively and require valid 3-to-16-character Minecraft usernames.
+- Mark the disconnect as mod-initiated before disconnecting. Auto Reconnect clears pending retries and stops; a later genuine disconnect starts a new decision.
 
 ## Anti-AFK
 
