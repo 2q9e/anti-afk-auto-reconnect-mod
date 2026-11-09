@@ -113,7 +113,7 @@ public final class AutoRespawnSettingsScreen extends Screen {
         form.arrangeElements();
         scrollArea.arrangeElements();
         scrollArea.setMaxHeight(layout.getContentHeight());
-        
+
         layout.arrangeElements();
         scrollArea.setX((width - scrollArea.getWidth()) / 2);
         scrollArea.setY(layout.getHeaderHeight());
