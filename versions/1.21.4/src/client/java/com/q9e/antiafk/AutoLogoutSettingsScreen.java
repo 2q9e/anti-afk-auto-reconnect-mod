@@ -94,3 +94,27 @@ public final class AutoLogoutSettingsScreen extends Screen {
             updated.detectionRangeBlocks = Integer.parseInt(range.getValue().trim());
         } catch (NumberFormatException exception) {
             status = "Enter a whole number for the Auto Logout range.";
+            return;
+        }
+
+        updated.ignoredUsernames = Arrays.stream(ignoredUsernames.getValue().split(","))
+            .map(String::trim)
+            .filter(username -> !username.isEmpty())
+            .toList();
+
+        ModConfig candidate = draft.copy();
+        candidate.autoLogout = updated;
+        String error = candidate.validationError();
+        if (error != null) {
+            status = error;
+            return;
+        }
+
+        draft.autoLogout = updated;
+        minecraft.setScreen(parent);
+    }
+
+    private static Component toggleMessage(String label, boolean enabled) {
+        return Component.literal(label + ": " + (enabled ? "ON" : "OFF"));
+    }
+
