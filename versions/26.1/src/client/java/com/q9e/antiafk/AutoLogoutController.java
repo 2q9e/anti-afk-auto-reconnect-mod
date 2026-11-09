@@ -3,6 +3,7 @@ package com.q9e.antiafk;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.world.entity.player.Player;
 
@@ -45,7 +46,7 @@ public final class AutoLogoutController {
 
             disconnecting = true;
             reconnectController.markModInitiatedDisconnect();
-            client.disconnect();
+            client.disconnect(new TitleScreen(), false);
             return;
         }
     }
