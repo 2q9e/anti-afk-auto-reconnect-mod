@@ -94,3 +94,27 @@ public final class AutoRespawnSettingsScreen extends Screen {
         String error = candidate.validationError();
         if (error != null) {
             status = error;
+            return;
+        }
+
+        draft.autoRespawn = updated;
+        minecraft.setScreen(parent);
+    }
+
+    private static Component toggleMessage(String label, boolean enabled) {
+        return Component.literal(label + ": " + (enabled ? "ON" : "OFF"));
+    }
+
+    @Override
+    protected void repositionElements() {
+        if (layout == null || scrollArea == null) {
+            return;
+        }
+        form.arrangeElements();
+        scrollArea.arrangeElements();
+        scrollArea.setMaxHeight(layout.getContentHeight());
+        
+        layout.arrangeElements();
+        scrollArea.setX((width - scrollArea.getWidth()) / 2);
+        scrollArea.setY(layout.getHeaderHeight());
+    }
