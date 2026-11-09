@@ -28,8 +28,6 @@ public final class AutoWelcomeController {
         AutoWelcomeSettings settings
     ) {
         if (!isEnabledInWorld(client, settings) || client.gui.screen() != null
-            || client.gui.overlay() != null || senderId == null || signedContent == null
-            || client.player.getUUID().equals(senderId)) {
             return;
         }
 
@@ -41,7 +39,7 @@ public final class AutoWelcomeController {
             clear();
         }
         if (pending || tick < nextScanAt
-            || !signedContent.toLowerCase(Locale.ROOT).contains(REPLY)) {
+            || !messageContent.toLowerCase(Locale.ROOT).contains(REPLY)) {
             return;
         }
 
