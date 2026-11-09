@@ -70,3 +70,27 @@ public final class AutoRespawnSettingsScreen extends Screen {
     }
 
     private void addToggle(String label, int buttonWidth, BooleanSupplier read, Consumer<Boolean> write) {
+        Button button = Button.builder(toggleMessage(label, read.getAsBoolean()), widget -> {
+            boolean nextValue = !read.getAsBoolean();
+            write.accept(nextValue);
+            widget.setMessage(toggleMessage(label, nextValue));
+        }).bounds(0, 0, buttonWidth, 22).build();
+        form.addChild(button);
+    }
+
+    private void apply() {
+        AutoRespawnSettings updated = new AutoRespawnSettings();
+        updated.enabled = enabled;
+        try {
+            updated.delaySeconds = Integer.parseInt(delay.getValue().trim());
+        } catch (NumberFormatException exception) {
+            status = "Enter a whole number for the Auto Respawn delay.";
+            return;
+        }
+
+        ModConfig candidate = draft.copy();
+        candidate.autoRespawn = updated;
+        String error = candidate.validationError();
+        if (error != null) {
+            status = error;
+            return;
