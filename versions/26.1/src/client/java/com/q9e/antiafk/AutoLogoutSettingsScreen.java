@@ -142,3 +142,12 @@ public final class AutoLogoutSettingsScreen extends Screen {
     ) {
         super.extractRenderState(graphics, mouseX, mouseY, delta);
         if (!status.isEmpty()) {
+            graphics.text(font, status, 12, height - 56, 0xFFFF5555, true);
+        }
+    }
+
+    @Override
+    public void onClose() {
+        minecraft.setScreen(parent);
+    }
+}
