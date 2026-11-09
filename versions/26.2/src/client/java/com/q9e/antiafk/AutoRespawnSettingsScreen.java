@@ -22,3 +22,27 @@ public final class AutoRespawnSettingsScreen extends Screen {
     private EditBox delay;
     private boolean enabled;
     private String status = "";
+
+    public AutoRespawnSettingsScreen(Screen parent, ModConfig draft) {
+        super(Component.literal("Auto Respawn settings"));
+        this.parent = parent;
+        this.draft = draft;
+    }
+
+    @Override
+    protected void init() {
+        AutoRespawnSettings settings = draft.autoRespawn;
+        int buttonWidth = Math.max(110, Math.min(240, width - 64));
+        enabled = settings.enabled;
+
+        layout = new HeaderAndFooterLayout(this, 32, 42);
+        layout.addTitleHeader(title, font);
+        form = LinearLayout.vertical().spacing(6);
+        form.defaultCellSetting().alignHorizontallyLeft();
+
+        addToggle("Auto Respawn", buttonWidth, () -> enabled, value -> enabled = value);
+        addLabel("Automatically respawn after death-screen delay.");
+        addLabel("The delay starts again for each new death.");
+        addLabel("Respawn delay (seconds)");
+        delay = new EditBox(font, 0, 0, 110, 20, Component.literal("Auto Respawn delay"));
+        delay.setMaxLength(8);
