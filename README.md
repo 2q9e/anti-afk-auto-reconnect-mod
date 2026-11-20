@@ -1,6 +1,6 @@
 # Anti-AFK and Auto-Reconnect Mod
 
-A client-side Fabric mod for timed anti-AFK actions, reconnecting to a configured Minecraft server, replying to incoming chat and system messages with Auto Welcome, respawning after a configurable delay, and disconnecting when a non-ignored player comes within range.
+Configure scheduled in-game inputs, reconnect to a selected server, respond to chat and system messages, and respawn after a delay. The mod also supports proximity-based disconnects. Separate Fabric builds cover the Minecraft releases in the compatibility table below.
 
 The mod's settings and feature logic run locally on your device. The mod itself makes no connections to external services and uses no VPS, remote control server, telemetry, or analytics. During normal Minecraft use, the game client connects to Microsoft/Mojang services for account and session functions and to the Minecraft server you choose to join.
 
